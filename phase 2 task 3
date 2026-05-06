@@ -1,1 +1,62 @@
+---
+title: "ST117 Individual DRAFT Written Report - Phase 2 Task 3 (Woodland vegetation - Butterflies and Moths)"
+author: "Report Pod XY-ab"
+date: "1999-12-31" 
+output: pdf_document
+geometry: top=1cm, bottom=1cm
+---
 
+- Please replace XY-ab in filename.  
+- Please replace XY-ab, and 1999-12-31 in the header.  
+- Please read the document "WR Assessment, Style, and Submission Guidance" (see Moodle).  
+- By submitting this assignment, you confirm that you have read and will adhere to the guidance on AI set out in that document.  
+- Remember that you are responsible for everything that you submit.  
+- Please adhere to Word, page, figure, and table limits. 
+- Note that 20% of the total credit is dedicated to style.
+- Please include R code in both Rmd and pdf files.
+
+# Contributions
+
+This submission was created by (extend as needed):
+1. WARWICK ID: a1, a2,... 
+2. WARWICK ID: b1, b2,... 
+3. WARWICK ID: c1, c2,... 
+4. WARWICK ID: d1, d2,... 
+
+
+```{r setup, include=FALSE}
+#Code to setup packages should go here, for example
+library(dplyr)
+library(tidyr)
+library(knitr)
+library(ggplot2)
+```
+
+
+# a)
+*include an output of three rows*
+
+```{r a}
+
+```
+
+# b)
+*Limit: 50 words + 2 figures*
+
+```{r b}
+
+```
+
+# c)
+*Limit: 200 words*
+
+```{r c}
+
+```
+
+# d)
+*Limit: 300 words + 5 figures + 2 tables*
+
+```{r d}
+
+```
