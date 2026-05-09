@@ -1,7 +1,7 @@
 ---
 title: "ST117 Individual DRAFT Written Report - Phase 2 Task 1 (Woodland Vegetation – Tree Measurements)"
-author: "Report Pod XY-ab"
-date: "1999-12-31" 
+author: "Report Pod MS-05"
+date: "2026-05-10" 
 output: pdf_document
 geometry: top=1cm, bottom=1cm
 ---
@@ -31,6 +31,10 @@ library(dplyr)
 library(tidyr)
 library(knitr)
 library(ggplot2)
+library(viridis)
+library(hrbrthemes)
+library(RColorBrewer)
+wl <- read.csv("ECN_VW1.csv")
 ```
 
 
@@ -38,26 +42,168 @@ library(ggplot2)
 *include an output of three rows*
 
 ```{r a}
-
+wl_wide <- wl %>%
+  filter(TREE_SPEC != 28 | is.na(TREE_SPEC)) %>%
+  filter(FIELDNAME %in% c("DIAMETER", "HEIGHT", "DISTANCE", "NUM_STEMS")) %>%
+  pivot_wider(
+    id_cols = c(SITECODE, SYEAR, TREEID, STEMID, TREE_SPEC),
+    names_from = FIELDNAME,
+    values_from = VALUE,
+    values_fn = mean
+  ) %>%
+  select(SITECODE, SYEAR, TREE_SPEC, DIAMETER, HEIGHT, DISTANCE, NUM_STEMS)
+head(wl_wide, 3)
 ```
 
 # b)
 *Limit: 50 words + 1 table.*
 
 ```{r b}
+model1 <- lm(HEIGHT ~ DIAMETER, data = wl_wide)
+summary(model1)
 
+kable(summary(model1)$coefficients, 
+      digits = 3,
+      caption = "Linear regression: Height ~ Diameter")
 ```
+We select diameter as the predictor and height as the response variable. This is reasonable since taller trees tend to have wider trunks. The model is highly statistically significant (p < 2.2e-16), with a slope of 0.109 indicating an increase in height per unit diameter. However, the low R-squared (0.15) suggests that other factors such as species and site conditions also affect tree height.
 
 # c)
 *Limit: 400 words + 10 figures + 5 tables*
 
 ```{r c}
+model_T05 <- lm(HEIGHT ~ DIAMETER, data = wl_wide %>% filter(SITECODE == "T05"))
+model_T06 <- lm(HEIGHT ~ DIAMETER, data = wl_wide %>% filter(SITECODE == "T06"))
+model_T08 <- lm(HEIGHT ~ DIAMETER, data = wl_wide %>% filter(SITECODE == "T08"))
+model_T09 <- lm(HEIGHT ~ DIAMETER, data = wl_wide %>% filter(SITECODE == "T09"))
 
+ggplot(wl_wide, aes(x = DIAMETER, y = HEIGHT)) +
+  geom_point(alpha = 0.3, colour = "steelblue") +
+  geom_smooth(method = "lm", colour = "red") +
+  labs(title = "Overall: Height ~ Diameter", x = "Diameter", y = "Height") +
+  theme_minimal()
+
+ggplot(wl_wide %>% filter(SITECODE == "T05"), aes(x = DIAMETER, y = HEIGHT)) +
+  geom_point(alpha = 0.3, colour = "steelblue") +
+  geom_smooth(method = "lm", colour = "red") +
+  labs(title = "T05: Height ~ Diameter", x = "Diameter", y = "Height") +
+  theme_minimal()
+
+ggplot(wl_wide %>% filter(SITECODE == "T06"), aes(x = DIAMETER, y = HEIGHT)) +
+  geom_point(alpha = 0.3, colour = "steelblue") +
+  geom_smooth(method = "lm", colour = "red") +
+  labs(title = "T06: Height ~ Diameter", x = "Diameter", y = "Height") +
+  theme_minimal()
+
+ggplot(wl_wide %>% filter(SITECODE == "T08"), aes(x = DIAMETER, y = HEIGHT)) +
+  geom_point(alpha = 0.3, colour = "steelblue") +
+  geom_smooth(method = "lm", colour = "red") +
+  labs(title = "T08: Height ~ Diameter", x = "Diameter", y = "Height") +
+  theme_minimal()
+
+ggplot(wl_wide %>% filter(SITECODE == "T09"), aes(x = DIAMETER, y = HEIGHT)) +
+  geom_point(alpha = 0.3, colour = "steelblue") +
+  geom_smooth(method = "lm", colour = "red") +
+  labs(title = "T09: Height ~ Diameter", x = "Diameter", y = "Height") +
+  theme_minimal()
+
+plot(model1, which = 1, main = "Overall: Residuals vs Fitted")
+plot(model_T05, which = 1, main = "T05: Residuals vs Fitted")
+plot(model_T06, which = 1, main = "T06: Residuals vs Fitted")
+plot(model_T08, which = 1, main = "T08: Residuals vs Fitted")
+plot(model_T09, which = 1, main = "T09: Residuals vs Fitted")
+
+kable(summary(model_T05)$coefficients, digits = 3, caption = "T05: Height ~ Diameter")
+kable(summary(model_T06)$coefficients, digits = 3, caption = "T06: Height ~ Diameter")
+kable(summary(model_T08)$coefficients, digits = 3, caption = "T08: Height ~ Diameter")
+kable(summary(model_T09)$coefficients, digits = 3, caption = "T09: Height ~ Diameter")
+
+data.frame(
+  Model = c("Overall", "T05", "T06", "T08", "T09"),
+  R_squared = c(
+    summary(model1)$r.squared,
+    summary(model_T05)$r.squared,
+    summary(model_T06)$r.squared,
+    summary(model_T08)$r.squared,
+    summary(model_T09)$r.squared
+  ),
+  Slope = c(
+    coef(model1)[2],
+    coef(model_T05)[2],
+    coef(model_T06)[2],
+    coef(model_T08)[2],
+    coef(model_T09)[2]
+  )
+) %>% kable(digits = 3, caption = "Model comparison across sites")
 ```
+All five models show a positive relationship between diameter and height, consistent with expected tree growth where larger diameter trees tend to be taller. However, model fit varies quite a lot across sites, suggesting that the relationship between diameter and height is not uniform across the woodland locations monitored by the ECN.
+T05 shows the strongest fit (R^2 = 0.84), with a slope of 1.108, suggesting that diameter is a very strong predictor of height at this site. T06 shows moderate fit (R^2 = 0.50) with a shallower slope of 0.204, while T08 is weaker still (R^2 = 0.38, slope = 0.161), suggesting that at these sites other factors beyond diameter contribute more to variation in height.
+T09 shows almost no relationship between diameter and height (R^2 = 0.025, slope = 0.043), suggesting that diameter is a very poor predictor of height at this site. This could reflect a more diverse tree species composition at T09, where different species have different growth forms, or it could reflect differences environmental conditions that affect diameter and height growth.
+The overall model (R^2 = 0.15) performs poorly compared to the site-level models, demonstrating that pooling data across sites masks important site-level variation in the diameter-height relationship. The residual plots for T08 and T09 closely resemble the overall model, reflecting their larger contribution to the pooled dataset, while T05 and T06 show distinct residual patterns.
 
 # d)
 *Limit: 300 words + 4 figures + 4 tables*
 
 ```{r d}
+wl_wide %>%
+  filter(SITECODE == "T05") %>%
+  ggplot(aes(x = DIAMETER, y = HEIGHT, colour = factor(TREE_SPEC))) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "T05: Height ~ Diameter by species",
+       x = "Diameter", y = "Height", colour = "Species") +
+  theme_minimal()
 
+wl_wide %>%
+  filter(SITECODE == "T06") %>%
+  ggplot(aes(x = DIAMETER, y = HEIGHT, colour = factor(TREE_SPEC))) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "T06: Height ~ Diameter by species",
+       x = "Diameter", y = "Height", colour = "Species") +
+  theme_minimal()
+
+wl_wide %>%
+  filter(SITECODE == "T08") %>%
+  ggplot(aes(x = DIAMETER, y = HEIGHT, colour = factor(TREE_SPEC))) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "T08: Height ~ Diameter by species",
+       x = "Diameter", y = "Height", colour = "Species") +
+  theme_minimal()
+
+wl_wide %>%
+  filter(SITECODE == "T09") %>%
+  ggplot(aes(x = DIAMETER, y = HEIGHT, colour = factor(TREE_SPEC))) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "T09: Height ~ Diameter by species",
+       x = "Diameter", y = "Height", colour = "Species") +
+  theme_minimal()
+
+model_T05_sp <- lm(HEIGHT ~ DIAMETER + factor(TREE_SPEC), 
+                   data = wl_wide %>% filter(SITECODE == "T05"))
+model_T06_sp <- lm(HEIGHT ~ DIAMETER + factor(TREE_SPEC), 
+                   data = wl_wide %>% filter(SITECODE == "T06"))
+model_T08_sp <- lm(HEIGHT ~ DIAMETER + factor(TREE_SPEC), 
+                   data = wl_wide %>% filter(SITECODE == "T08"))
+model_T09_sp <- lm(HEIGHT ~ DIAMETER + factor(TREE_SPEC), 
+                   data = wl_wide %>% filter(SITECODE == "T09"))
+
+data.frame(
+  Site = c("T05", "T06", "T08", "T09"),
+  R2_without_species = c(
+    summary(model_T05)$r.squared,
+    summary(model_T06)$r.squared,
+    summary(model_T08)$r.squared,
+    summary(model_T09)$r.squared),
+  R2_with_species = c(
+    summary(model_T05_sp)$r.squared,
+    summary(model_T06_sp)$r.squared,
+    summary(model_T08_sp)$r.squared,
+    summary(model_T09_sp)$r.squared)
+) %>% kable(digits = 3, caption = "R-squared before and after including tree species")
 ```
+A key feature affecting simple linear regression at all four sites is the presence of multiple tree species with distinct diameter-height relationships. Different species have different growth forms, meaning a single regression line fitted across all species will not be able to capture the true relationships within each species.
+At T05, species 2600 shows a much steeper diameter-height slope than species 237, while species 441 has only a single observation, making species-level analysis unreliable for rare species. At T06, the dominant species 570 drives the overall relationship while other species show different patterns. T08 is the most species-diverse site with 30+ species, explaining its moderate R-squared of 0.38. The many different growth forms create considerable scatter around a single regression line. At T09, despite species 292 dominating, the near-zero R-squared (0.025) suggests that even within sites, species differences overwhelm any simple diameter-height relationship.
+To account for this, we refit the model including TREE_SPEC as an additional categorical predictor. This substantially improves model fit across all sites. R-squared increases from 0.84 to 0.94 at T05, 0.50 to 0.69 at T06, 0.38 to 0.77 at T08, and 0.025 to 0.13 at T09. While T09 remains weak even after accounting for species, the improvements at other sites confirm that species identity is an important predictor of the diameter-height relationship.
