@@ -30,29 +30,180 @@ library(dplyr)
 library(tidyr)
 library(knitr)
 library(ggplot2)
+library(lubridate)
+library(viridis)
+library(hrbrthemes)
+library(RColorBrewer)
 ```
+
 
 
 # a)
 *Limit: 150 words + 6 figures*
 
-```{r a}
+```{r a,warning=FALSE}
+
+library(here)
+
+mothdata <- read.csv(here("mothdata.csv"))
+
+
+moths1=mothdata
+moths1$SDATE=as.Date(moths1$SDATE,format="%d-%b-%y") # changes dates to be recognised as dates
+moths1$WEEK = week(moths1$SDATE) #groups by week
+
+#groups by sitecode and week and counts how many moths were spotted
+moths1byweek=moths1 %>%
+  group_by(SITECODE,WEEK)%>%
+  summarise(TOTAL=sum(VALUE,na.rm=TRUE))
+
+
+#sets the colours for the stacked bar charts
+colours=c("firebrick2","sandybrown","lightgoldenrod2","darkolivegreen2","springgreen4","aquamarine3","steelblue","blue3","purple4","mediumvioletred","hotpink2","lightpink")
+
+#graphs how many were spotted in each week in each area
+ggplot(moths1byweek,aes(WEEK,TOTAL,fill=SITECODE))+
+  geom_col(position="stack")+
+  theme(axis.text.x=element_text(angle=90))+
+  scale_fill_manual(values=colours)+
+  labs(title="All moth species")
+
+
+#creates a list of species and their associated code
+
+species=list(c("2178","Diamond Backed Moth"), c("126","Peach Blossom"),c("269","Common Swift"),c("280","Heart & Club"),c("488","Rosy Rustic"))
+
+#plots for each species in the list
+
+for (k in species) {
+  #creates a new dataframe with the data for the given species only
+  temp=moths1
+  moths1$FIELDNAME=as.character(moths1$FIELDNAME)
+  temp=moths1 %>%
+    filter(FIELDNAME==as.character(k[1]))%>%
+    group_by(SITECODE,WEEK)%>%
+    summarise(TOTAL=sum(VALUE,na.rm=TRUE))
+  
+  #creates a stacked bar chart of weekly sightings
+  print(ggplot(temp,aes(WEEK,TOTAL,fill=SITECODE))+
+    geom_col(position="stack")+
+    theme(axis.text.x=element_text(angle=90))+
+    scale_fill_manual(values=colours)+
+    labs(title=k[2]))
+}
+
 
 ```
+
+
+Overall, moths tend to be more prevalent in the summer with a peak around week 30 with around 40,000 sightings compared to around 10,000 in the winter.
+The diamond backed moth is most prevalent in T06, mostly spotted around weeks 24 and 32 in June and August with a decrease in July and almost no sightings in the winter months. This suggests that they prefer warm weather over very hot. The peach blossom is spotted most in week 27, June/July with the Common Swift also being most common in week 24 and and Heart & Club in week 25 in T10 or T09. All four moth species seem to be most common in the summer and die or hide in the winter. The Rosy Rustic is different, it is most prevalent in week 36, early September and continues to be spotted into the autumn and winter months.
+
 
 # b)
 *Limit: 150 words + 1 figure*
 
-```{r b}
+```{r b,warning=FALSE}
+#adds the data about flightwindow to the original moths dataframe
+moths1 = moths1%>%
+  left_join(moths1 %>%
+    group_by(FIELDNAME)%>%
+    summarise(first=min(WEEK,na.rm=TRUE),last=max(WEEK,na.rm=TRUE),flightwindow=last-first+1))
+moths1$YEAR=year(moths1$SDATE)
 
+#creates a new dataframe with the flightwindow data for each individual species instead of 
+#repeating for each sighting
+mothplot= moths1%>%
+  group_by(FIELDNAME,SITECODE,YEAR)%>%
+    summarise(first=min(WEEK,na.rm=TRUE),last=max(WEEK,na.rm=TRUE),flightwindow=last-first+1)
+
+#plots the data
+ggplot(data=mothplot,aes(x=flightwindow))+
+  geom_histogram(fill="hotpink2")
 ```
+The inflation in window length 1 is likely non biological because it is unlikely for a species to actually only survive one week out of the year, they would not be able to come back the next year if their lifespans really were so short as they would all die by then. It is more likely that they are just very rare and only happened to be spotted once or during one particular week or they do not tend to live in the sorts of areas that the traps were placed so they are also spotted once. Alternatively they could require specific conditions like weather or particularly high or low temperatures that are rare so while they are around you won't catch them often.
 
 # c)
 *Limit: mathematical derivations + 200 words + 1 figure + 1 table*
 
 Guidance on using LaTeX is provided in Log 5. Alternatively, you may write mathematical derivations by hand and include them as an image.
 
-```{r c}
+Poisson:
+$\lambda=\bar{x}=\frac{1}{n}\sum_{i=1}^{n}x_i$
+
+Gamma:
+$\bar{x}$=$\frac{k}{\theta}$
+$s^2$=$\frac{k}{\theta^2}$
+
+$\frac{s^2}{\bar{x}^2}=\frac{1}{k}$
+so $\hat{k}=\frac{\bar{x}^2}{s^2}$
+and $\hat{\theta}=\frac{\bar{x}}{s^2}$
+
+Negative binomial:
+$\bar{x}=\frac{r(1-p)}{p}$
+$s^2=\frac{r(1-p)}{p^2}$
+
+$p=\frac{\bar{x}}{s^2}$
+and $\hat{r}=\frac{\bar{x}^2}{s^2-\bar{x}}$
+
+```{r c,warning=FALSE}
+#filters so only flight windows of 2 weeks or longer are counted
+moths1filtered=mothplot%>%
+  filter(flightwindow>=2)
+
+#calcualtes the method of moments estimators
+mothmean=mean(moths1filtered$flightwindow)
+mothvar=var(moths1filtered$flightwindow)
+
+poissonmean=mothmean
+
+gammak=mothmean^2/mothvar
+gammatheta=mothmean/mothvar
+
+nbp=mothmean/mothvar
+nbr=mothmean^2/(mothvar-mothmean)
+
+#calculates bin width for scaling later by creating the histogram but not displaying it
+plot=ggplot(moths1filtered,aes(x=flightwindow))+
+  geom_histogram((aes(y=..density..)))
+temp2=ggplot_build(plot)
+binwidth=diff(temp2$data[[1]]$x)[1]
+
+
+poissonframe=data.frame(x=0:max(moths1filtered$flightwindow)) 
+#creates a data frame with values from 0 to the maximum to be used 
+#to create a smooth scaled curve
+
+poissonframe$prob = dpois(poissonframe$x,lambda=poissonmean)
+#calculates probabilities for each x
+
+poissonframe$prob=poissonframe$prob /binwidth
+
+#repeats for negative binomial
+nbframe=data.frame(x=0:max(moths1filtered$flightwindow))
+nbframe$prob=dnbinom(nbframe$x,prob=nbp,size=nbr)
+nbframe$pob=nbframe$prob/binwidth
+
+
+#plots the original data with density instead of count as well as the gamma model
+ggplot(moths1filtered,aes(x=flightwindow))+
+  geom_histogram((aes(y=..density..)),fill="hotpink2")+
+  geom_line(data=poissonframe,aes(x=x,y=prob),col="hotpink4",linewidth=0.5)+
+  stat_function(fun=dgamma,args=list(shape=gammak,rate=gammatheta),linewidth=0.5,col="darkorchid1")+
+  geom_line(data=nbframe,aes(x=x,y=prob),col="dodgerblue",linewidth=0.5)
+
 
 ```
+```{r c2,warning=FALSE}
+#log likelihoods
+poissonlog=sum(dpois(moths1filtered$flightwindow,lambda=poissonmean,log=TRUE))
+
+gammalog=sum(dgamma(moths1filtered$flightwindow,shape=gammak,rate=gammak,log=TRUE))
+
+nblog=sum(dnbinom(moths1filtered$flightwindow,size=nbr,prob=nbp,log=TRUE))
+```
+
+A less negative log-likelihood means that the model fits better. The value for poisson is -85061, for gamma it is -162600 and for negative binomial it is -63405. This suggests that negative binomial is closest to the distribution. None of the models perfectly fit the distribution or have the maximum at the same point as it but the negative binomial does look the best matched as well as it is also negatively skewed and the closest shape.
+The poisson graph is easy as it only uses one parameter that requires almost no calculation but the shape is very inaccurate, it is too far to the right and approaches zero before the data actually starts to get close to there so the tail is lower than the histogram.
+The gamma distribution has a more accurate shape, with the maximum getting closer to the maximum than any other and the tail almost tracing the histogram. However a downside is that it is difficult to calculate and used for continuous data whereas this is not continuous. Additionally the parameters are more complicated than the others, probability and mean are self explanatory but shape and rate require more thinking to relate to the behaviour.
 
