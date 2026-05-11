@@ -1,0 +1,174 @@
+---
+title: "ST117 Pod FINAL Written Report - Phase 2 Task 4 (Fine grains - Butterflies)"
+author: "Report Pod MS-05"
+date: "2026-05-09" 
+output: pdf_document
+geometry: top=1cm, bottom=1cm
+---
+
+# Contributions
+
+This submission was created by:
+1. u5692931: a, b, c, d
+
+
+```{r setup, include=FALSE}
+#Code to setup packages should go here, for example
+library(dplyr)
+library(tidyr)
+library(knitr)
+library(ggplot2)
+library(lubridate)
+library(kableExtra)
+```
+
+
+# a)
+*include an output of three rows*
+
+```{r a}
+vf <- read.csv("Vegetation/VF_FinGrain_Vegetation_1994-2015/Raw_Data/ECN_VF1_RawData.csv")
+ib <- read.csv("Invertebrates/Lepidoptera_Butterflies_1993-2015/Raw_Data/ECN_IB1_RawData.csv")
+
+ib$YEAR <- year(dmy(ib$SDATE))
+
+vf_veg        <- vf[vf$FIELDNAME == "VEG_SPEC", ] # ruling out non-"veg-spec"
+
+vf_spec_count <- summarise(group_by(vf_veg, SITECODE, SYEAR),
+                           finegrain_species = n_distinct(VALUE),
+                           .groups = "drop") # one row per combo
+
+colnames(vf_spec_count)[colnames(vf_spec_count) == "SYEAR"] <- "YEAR" # rename for consistency
+
+# Same thing for ib
+ib_clean      <- ib[ib$FIELDNAME != "XX", ]
+
+ib_count      <- summarise(group_by(ib_clean, SITECODE, YEAR),
+                           total_butterflies = sum(VALUE, na.rm = TRUE),
+                           .groups = "drop")
+
+combined  <- merge(vf_spec_count, ib_count, by = c("SITECODE", "YEAR")) # merging for output
+
+kable_styling(
+  kable(combined[1:3, ],
+        caption   = "First three rows of the aggregated 
+        Fine Grain species and Butterfly count dataset",
+        longtable = FALSE,
+        format    = "latex"),
+  latex_options = c("scale_down", "hold_position")
+)
+
+```
+
+# b)
+*Limit: 100 words + 1 figure*
+
+```{r b}
+ggplot(combined, aes(x = finegrain_species, y = total_butterflies, colour = SITECODE)) +
+  geom_point(alpha = 0.5, size = 1.5) +
+  labs(x = "Number of unique Fine Grain species",
+       y = "Total annual butterfly count",
+       title = "Fine Grain species count & yearly butterfly count") +
+  theme(legend.position = "bottom") +
+  guides(colour = guide_legend(nrow = 2))
+```
+
+Within the same time period, butterfly abundance and fine grain plant species richness are expected to correlate positively, since more plant variety provides richer food resources, supporting greater butterfly populations. However, the scatterplot reveals nearly no such relationship, whether linear or otherwise. Instead, points of the same site colour cluster closely together, suggesting that butterfly counts remain consistent within each site regardless of vegetation richness. This implies that site-level conditions, such as climate, temperature and humidity, are the determining factors of butterfly abundance. Furthermore, several outliers are observed in the butterfly count axis, one of which is notably extreme.
+
+# c)
+*Limit: 200 words + 5 figures + 1 table*
+
+To best model linear regression, we need to remove outliers. Outliers beyond $1.5 \times$IQR from Q1 and Q3 will be removed from the regression dataset.
+
+```{r c}
+# Remove outliers
+threshold       <- quantile(combined$total_butterflies, 0.75) + 
+  1.5 * IQR(combined$total_butterflies) 
+#upper outlier threshold
+remain <- combined[combined$total_butterflies <= threshold, ] #rule out outliers
+
+# Fit model
+lin_mod <- lm(total_butterflies ~ finegrain_species, data = remain) 
+#fitting linear model in order of response ~ predictor
+all_para  <- summary(lin_mod) #store all the parameters
+
+# Regression line on scatter plot
+plot(remain$finegrain_species, remain$total_butterflies,
+     col  = as.factor(remain$SITECODE),
+     pch  = 16,
+     xlab = "Number of unique Fine Grain species",
+     ylab = "Total annual butterfly count",
+     main = "SLR: Butterfly count ~ Fine Grain species (outlier removed)")
+abline(lin_mod, col = "red", lwd = 2)
+
+# Parameters plotting
+par(mfrow = c(2, 2)) # having 2 each row
+plot(lin_mod)
+par(mfrow = c(1, 1)) #reset back to 1
+
+# Table: coefficient summary
+all_coefs <- data.frame(
+  Term     = c("Intercept", "finegrain_species"),
+  Estimate = round(coef(lin_mod), 3),
+  SE       = round(all_para$coefficients[, 2], 3),
+  t        = round(all_para$coefficients[, 3], 3),
+  p        = formatC(all_para$coefficients[, 4], format = "e", digits = 2),
+  row.names = NULL
+)
+
+kable_styling(
+  kable(all_coefs,
+        col.names = c("Term", "Estimate", "Std. Error", "t value", "Pr(>|t|)"),
+        caption   = paste0("SLR: total\\_butterflies ~ finegrain\\_species  (n = ",
+                           nrow(remain),
+                           ", R² = ", round(all_para$r.squared, 3), ")"),
+        longtable = FALSE,
+        format    = "latex"),
+  latex_options = c("hold_position")
+)
+```
+
+After removal of outliers, a linear regression line is plot, taking `finegrain_species` as independent variable and butterfly count as dependent. We can clearly see that the line represents only mild positive regression ($R^2$ is extremely low), which indicates that this relationship is only a minor determining factor. The four diagnostic plots reveal more insight. The plot shows a "fan" pattern where the points spread out more as the fitted values increase. In the QQ plot, most points follow the diagonal line, but at the higher end, the points curve downwards and drift away from the path. This indicates a "light-tailed" distribution. The red line in the standardised residuals plot shows a slight upward trend, and the standardized residuals spread out more as the fitted values increase. This implies that the uncertainty in data prediction is not stable and as the model predicts higher butterfly counts, the actual data points become more scattered. The leverage plot shows influential points remain within safe limits. Overall, the model captures a real but weak biological trend.
+
+# d)
+*Limit: 100 words + 12 figures + 12 tables*
+
+```{r d, results='asis'}
+sites <- unique(remain$SITECODE) #grab unique sites
+
+for (s in sites) { #each value within T01 to T12
+  site_data <- remain[remain$SITECODE == s, ]
+  
+  lm_site  <- lm(total_butterflies ~ finegrain_species, data = site_data) #same linear model
+  s_site   <- summary(lm_site)
+  
+  plot(site_data$finegrain_species, site_data$total_butterflies,
+       col  = "darkblue",
+       pch  = 16,
+       xlab = "Number of unique Fine Grain species",
+       ylab = "Total annual butterfly count",
+       main = paste("Site", s, ": Butterfly count ~ Fine Grain species"))
+  abline(lm_site, col = "red", lwd = 2)
+  
+  coef_df <- data.frame(
+    Term     = c("Intercept", "finegrain_species"),
+    Estimate = round(coef(lm_site), 3),
+    SE       = round(s_site$coefficients[, 2], 3),
+    t        = round(s_site$coefficients[, 3], 3),
+    p        = formatC(s_site$coefficients[, 4], format = "e", digits = 2),
+    row.names = NULL
+  )
+  
+  print(kable_styling(
+    kable(coef_df,
+          col.names = c("Term", "Estimate", "Std. Error", "t value", "Pr(>|t|)"),
+          caption   = paste0("Site ", s, "  (n=", nrow(site_data),
+                             ", R²=", round(s_site$r.squared, 3), ")"),
+          longtable = FALSE,
+          format    = "latex"),
+    latex_options = c("hold_position")
+  ))
+}
+```
+
+By fitting the same model to each site separately, we can better understand why the combined regression in part (c) is weak. Across the 12 sites, the slope varies from positive to nearly flat to negative and when combined, the data points scatter with no clear overall trend. Some sites have very few data points, leading to wide confidence intervals and unreliable slope estimates. Site-level models are more ecologically interpretable but come at the cost of statistical power due to smaller sample sizes.

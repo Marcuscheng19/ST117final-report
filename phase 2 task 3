@@ -1,7 +1,7 @@
 ---
-title: "ST117 Individual DRAFT Written Report - Phase 2 Task 3 (Woodland vegetation - Butterflies and Moths)"
-author: "Report Pod XY-ab"
-date: "1999-12-31" 
+title: "ST117 Final Written Report - Phase 2 Task 3 (Woodland vegetation - Butterflies and Moths)"
+author: "Report Pod MS-05"
+date: "2026-05-11" 
 output: pdf_document
 geometry: top=1cm, bottom=1cm
 ---
@@ -18,45 +18,323 @@ geometry: top=1cm, bottom=1cm
 # Contributions
 
 This submission was created by (extend as needed):
-1. WARWICK ID: a1, a2,... 
+1. WARWICK ID 568279: Phase 2: 3a,3b,3c,3d
 2. WARWICK ID: b1, b2,... 
 3. WARWICK ID: c1, c2,... 
 4. WARWICK ID: d1, d2,... 
 
 
 ```{r setup, include=FALSE}
-#Code to setup packages should go here, for example
 library(dplyr)
 library(tidyr)
 library(knitr)
 library(ggplot2)
+library(lubridate)
+library(viridis)
+library(RColorBrewer)
+library(broom)
 ```
 
 
 # a)
-*include an output of three rows*
+```{r a, message=FALSE, warning=FALSE}
 
-```{r a}
+# 1. Load data
+bf <- read.csv("ECN_IB1.csv", stringsAsFactors = FALSE)   # butterflies
+mt <- read.csv("ECN_IM1.csv", stringsAsFactors = FALSE)   # moths
+vw <- read.csv("ECN_VW1.csv", stringsAsFactors = FALSE)   # woodland vegetation
 
+# 2. Clean data (based on EDA)
+
+# Butterflies
+bf$VALUE <- suppressWarnings(as.numeric(bf$VALUE))
+bf$DATE  <- as.Date(bf$SDATE, format = "%d-%b-%y")
+bf$YEAR  <- year(bf$DATE)
+
+bf_clean <- bf %>%
+  filter(!is.na(VALUE), VALUE > 0, !is.na(YEAR))
+
+
+# Moths
+mt$VALUE <- suppressWarnings(as.numeric(mt$VALUE))
+mt$DATE  <- as.Date(mt$SDATE, format = "%d-%b-%y")
+mt$YEAR  <- year(mt$DATE)
+
+mt_clean <- mt %>%
+  filter(!is.na(VALUE), VALUE > 0, !is.na(YEAR))
+
+
+# Woodland vegetation
+vw$YEAR <- vw$SYEAR
+
+vw_clean <- vw %>%
+  filter(!is.na(SITECODE), !is.na(YEAR), !is.na(TREE_SPEC))
+
+# 3. Aggregate vegetation
+veg_agg <- vw_clean %>%
+  group_by(SITECODE, YEAR) %>%
+  summarise(
+    unique_species = n_distinct(TREE_SPEC),
+    .groups = "drop"
+  )
+
+
+# 4. Butterfly aggregation
+bf_agg <- bf_clean %>%
+  group_by(SITECODE, YEAR) %>%
+  summarise(
+    total_butterflies = sum(VALUE),
+    .groups = "drop"
+  )
+
+# Merge with vegetation
+bf_final <- bf_agg %>%
+  left_join(veg_agg, by = c("SITECODE", "YEAR"))
+
+# Print first 3 rows
+head(bf_final, 3)
+
+# 5. Moth aggregation
+mt_agg <- mt_clean %>%
+  group_by(SITECODE, YEAR) %>%
+  summarise(
+    total_moths = sum(VALUE),
+    .groups = "drop"
+  )
+
+# Merge with vegetation
+mt_final <- mt_agg %>%
+  left_join(veg_agg, by = c("SITECODE", "YEAR"))
+
+# Print first 3 rows
+head(mt_final, 3)
 ```
 
 # b)
-*Limit: 50 words + 2 figures*
+```{r b, message=FALSE, warning=FALSE}
 
-```{r b}
+# 1. Load data
+bf <- read.csv("ECN_IB1.csv", stringsAsFactors = FALSE)
+mt <- read.csv("ECN_IM1.csv", stringsAsFactors = FALSE)
+vw <- read.csv("ECN_VW1.csv", stringsAsFactors = FALSE)
 
+# 2. Clean data
+
+# Butterflies
+bf$VALUE <- suppressWarnings(as.numeric(bf$VALUE))
+bf$DATE <- as.Date(bf$SDATE, format = "%d-%b-%y")
+bf$YEAR <- year(bf$DATE)
+
+bf_clean <- bf %>%
+  filter(!is.na(VALUE), VALUE > 0, !is.na(YEAR))
+
+# Moths
+mt$VALUE <- suppressWarnings(as.numeric(mt$VALUE))
+mt$DATE <- as.Date(mt$SDATE, format = "%d-%b-%y")
+mt$YEAR <- year(mt$DATE)
+
+mt_clean <- mt %>%
+  filter(!is.na(VALUE), VALUE > 0, !is.na(YEAR))
+
+# Vegetation
+vw$YEAR <- vw$SYEAR
+
+vw_clean <- vw %>%
+  filter(!is.na(SITECODE), !is.na(YEAR), !is.na(TREE_SPEC))
+
+
+# 3. Aggregate data
+
+# Vegetation richness 
+veg_agg <- vw_clean %>%
+  group_by(SITECODE) %>%
+  summarise(unique_species = n_distinct(TREE_SPEC), .groups = "drop")
+
+# Butterflies
+bf_agg <- bf_clean %>%
+  group_by(SITECODE, YEAR) %>%
+  summarise(total_butterflies = sum(VALUE), .groups = "drop") %>%
+  left_join(veg_agg, by = "SITECODE")
+
+# Moths
+mt_agg <- mt_clean %>%
+  group_by(SITECODE, YEAR) %>%
+  summarise(total_moths = sum(VALUE), .groups = "drop") %>%
+  left_join(veg_agg, by = "SITECODE")
+
+
+# 4. Scatterplots
+
+# Plot 1: Butterflies
+ggplot(bf_agg, aes(x = unique_species, y = total_butterflies,
+                   colour = factor(YEAR), shape = SITECODE)) +
+  geom_point(size = 3, alpha = 0.8) +
+  labs(title = "Butterflies vs Woodland Species Richness",
+       x = "Number of unique woodland vegetation species",
+       y = "Total annual butterfly counts",
+       colour = "Year",
+       shape = "Site") +
+  theme_minimal()
+
+
+# Plot 2: Moths
+ggplot(mt_agg, aes(x = unique_species, y = total_moths,
+                   colour = factor(YEAR), shape = SITECODE)) +
+  geom_point(size = 3, alpha = 0.8) +
+  labs(title = "Moths vs Woodland Species Richness",
+       x = "Number of unique woodland vegetation species",
+       y = "Total annual moth counts",
+       colour = "Year",
+       shape = "Site") +
+  theme_minimal()
 ```
 
 # c)
-*Limit: 200 words*
+Two clear issues stand out for fitting a simple linear regression.
 
-```{r c}
+First there is strong heteroscedasticity. The spread of butterfly and moth counts increase species richness changes, especially for lower
+richness values where counts vary widely. This violates the constant variance assumption of linear regression, meaning the model errors are 
+not evenly distributed. As a result, standard errors and inference from the model would be unreliable.
 
-```
+Second, there is clear clustering and limited variation in the predictor. Most observations are concentrated at just a few values of vegetation
+richness (around 3 and 7), rather than being spread continuously. This creates effectively grouped data rather than a true continuous 
+relationship, making it difficult for a linear model to capture a meaningful trend. It also suggest potential confounding by site, since 
+richness is largely site-driven, while counts vary strongly by year.
+
+Overall, these issues indicate that a simple linear regression is likely too simplistic, and the relationship may be better explained by site 
+effects or more flexible models.
 
 # d)
-*Limit: 300 words + 5 figures + 2 tables*
 
-```{r d}
+```{r d, fig.width=7, fig.height=5, message=FALSE, warning=FALSE}
 
+# Load data
+bf <- read.csv("ECN_IB1.csv", stringsAsFactors = FALSE)
+mt <- read.csv("ECN_IM1.csv", stringsAsFactors = FALSE)
+
+# Clean butterflies
+bf$VALUE <- suppressWarnings(as.numeric(bf$VALUE))
+bf$DATE  <- as.Date(bf$SDATE, format="%d-%b-%y")
+bf$YEAR  <- year(bf$DATE)
+
+bf_clean <- bf %>%
+  filter(!is.na(VALUE), VALUE > 0, !is.na(YEAR))
+
+# Clean moths
+mt$VALUE <- suppressWarnings(as.numeric(mt$VALUE))
+mt$DATE  <- as.Date(mt$SDATE, format="%d-%b-%y")
+mt$YEAR  <- year(mt$DATE)
+
+mt_clean <- mt %>%
+  filter(!is.na(VALUE), VALUE > 0, !is.na(YEAR))
+
+# Aggregate to annual totals
+bf_agg <- bf_clean %>%
+  group_by(SITECODE, YEAR) %>%
+  summarise(total_butterflies = sum(VALUE), .groups="drop")
+
+mt_agg <- mt_clean %>%
+  group_by(SITECODE, YEAR) %>%
+  summarise(total_moths = sum(VALUE), .groups="drop")
+
+# Merge datasets
+combined <- inner_join(bf_agg, mt_agg, by=c("SITECODE","YEAR"))
+
+# Figure 1: Raw relationship
+ggplot(combined, aes(total_butterflies, total_moths)) +
+  geom_point() +
+  labs(title="Butterflies vs Moths (raw)",
+       x="Total annual butterfly counts",
+       y="Total annual moth counts") +
+  theme_minimal()
+
+# Figure 2: Add grouping info
+ggplot(combined,
+       aes(total_butterflies, total_moths,
+           colour=factor(YEAR), shape=SITECODE)) +
+  geom_point(size=3, alpha=0.8) +
+  labs(title="Butterflies vs Moths (by year & site)",
+       x="Total annual butterfly counts",
+       y="Total annual moth counts",
+       colour="Year", shape="Site") +
+  theme_minimal()
+
+# Linear regression models
+model_raw <- lm(total_moths ~ total_butterflies, data=combined)
+
+# Figure 3: Regression (raw scale)
+ggplot(combined, aes(total_butterflies, total_moths)) +
+  geom_point() +
+  geom_smooth(method="lm", se=TRUE, colour="blue") +
+  labs(title="Linear model (raw scale)",
+       x="Butterflies",
+       y="Moths") +
+  theme_minimal()
+
+# Log transform (better fit)
+combined <- combined %>%
+  mutate(
+    log_bf = log(total_butterflies),
+    log_mt = log(total_moths)
+  )
+
+model_log <- lm(log_mt ~ log_bf, data=combined)
+
+# Figure 4: Regression (log scale)
+ggplot(combined, aes(log_bf, log_mt)) +
+  geom_point() +
+  geom_smooth(method="lm", se=TRUE, colour="red") +
+  labs(title="Linear model (log-log scale)",
+       x="log(Butterflies)",
+       y="log(Moths)") +
+  theme_minimal()
+
+# Figure 5: Final model (clean)
+ggplot(combined, aes(log_bf, log_mt)) +
+  geom_point(aes(colour=SITECODE), alpha=0.8) +
+  geom_smooth(method="lm", se=FALSE, colour="black", linewidth=1) +
+  labs(title="Final model: log(Moths) vs log(Butterflies)",
+       x="log(Butterflies)",
+       y="log(Moths)",
+       colour="Site") +
+  theme_minimal()
+
+# Table 1: Coefficient summaries
+raw_summary <- tidy(model_raw)
+log_summary <- tidy(model_log)
+
+raw_summary$model <- "Raw scale"
+log_summary$model <- "Log-log scale"
+
+combined_table <- bind_rows(raw_summary, log_summary) %>%
+  select(model, term, estimate, std.error, statistic, p.value)
+
+kable(combined_table, digits = 4,
+      caption = "Linear regression coefficients (raw vs log-transformed)")
+
+# Table 2: Model fit comparison
+fit_table <- data.frame(
+  Model = c("Raw scale", "Log-log scale"),
+  R_squared = c(summary(model_raw)$r.squared,
+                summary(model_log)$r.squared),
+  Adj_R_squared = c(summary(model_raw)$adj.r.squared,
+                    summary(model_log)$adj.r.squared),
+  AIC = c(AIC(model_raw), AIC(model_log))
+)
+
+kable(fit_table, digits = 4,
+      caption = "Model fit comparison (R², Adjusted R², AIC)")
 ```
+The relationship between butterfly and moth counts was first explored using scatterplots. On the raw scale, there is a positive association, 
+but the spread of the points increases as the counts get larger, which suggests heteroscedasticity. There are also a few extreme values, 
+indicating potential outliers that could have a strong influence on the model fit.
+
+A simple linear regression was initially fitted on the raw data. However, the assumptions of linear regression are not well satisfied here. 
+In particular, the variance of the residuals is not constant, and the relationship does not appear strictly linear, showing some curvature.
+
+To improve the model, both variables were log-transformed. After transformation, the relationship appears much more linear and the spread of the 
+data is more consistent across the range of values. This suggests that the assumptions of linearity and homoscedasticity are better met.
+
+The final model was therefore fitted using the log-transformed variables. This model provides a better fit to the data, and the slope can now 
+be interpreted in terms of proportional changes (i.e an elasticity). Overall, the log transformation improves the suitability of the linear 
+regression model for this type of ecological count data, which often shows skewness and non-constant variance.
