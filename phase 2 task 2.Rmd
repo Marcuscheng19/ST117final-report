@@ -1,31 +1,18 @@
 ---
 title: "ST117 Individual DRAFT Written Report - Phase 2 Task 2 (Moths-Flight windows)"
-author: "Report Pod XY-ab"
-date: "1999-12-31" 
-output: pdf_document
+author: "Report Pod MS-05"
+date: "2026-04-22"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
 geometry: top=1cm, bottom=1cm
 ---
-
-- Please replace XY-ab in filename.  
-- Please replace XY-ab, and 1999-12-31 in the header.  
-- Please read the document "WR Assessment, Style, and Submission Guidance" (see Moodle).  
-- By submitting this assignment, you confirm that you have read and will adhere to the guidance on AI set out in that document.  
-- Remember that you are responsible for everything that you submit.  
-- Please adhere to Word, page, figure, and table limits. 
-- Note that 20% of the total credit is dedicated to style.
-- Please include R code in both Rmd and pdf files.
-
-# Contributions
-
 This submission was created by (extend as needed):
-1. WARWICK ID: a1, a2,... 
-2. WARWICK ID: b1, b2,... 
-3. WARWICK ID: c1, c2,... 
-4. WARWICK ID: d1, d2,... 
-
+1. u5715483
 
 ```{r setup, include=FALSE}
-#Code to setup packages should go here, for example
+# Code to setup packages should go here, for example:
 library(dplyr)
 library(tidyr)
 library(knitr)
@@ -35,7 +22,6 @@ library(viridis)
 library(hrbrthemes)
 library(RColorBrewer)
 ```
-
 
 
 # a)
@@ -206,4 +192,3 @@ nblog=sum(dnbinom(moths1filtered$flightwindow,size=nbr,prob=nbp,log=TRUE))
 A less negative log-likelihood means that the model fits better. The value for poisson is -85061, for gamma it is -162600 and for negative binomial it is -63405. This suggests that negative binomial is closest to the distribution. None of the models perfectly fit the distribution or have the maximum at the same point as it but the negative binomial does look the best matched as well as it is also negatively skewed and the closest shape.
 The poisson graph is easy as it only uses one parameter that requires almost no calculation but the shape is very inaccurate, it is too far to the right and approaches zero before the data actually starts to get close to there so the tail is lower than the histogram.
 The gamma distribution has a more accurate shape, with the maximum getting closer to the maximum than any other and the tail almost tracing the histogram. However a downside is that it is difficult to calculate and used for continuous data whereas this is not continuous. Additionally the parameters are more complicated than the others, probability and mean are self explanatory but shape and rate require more thinking to relate to the behaviour.
-
