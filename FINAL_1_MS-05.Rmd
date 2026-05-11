@@ -18,10 +18,7 @@ geometry: top=1cm, bottom=1cm
 # Contributions
 
 This submission was created by (extend as needed):
-1. WARWICK ID: a1, a2,... 
-2. WARWICK ID: b1, b2,... 
-3. WARWICK ID: c1, c2,... 
-4. WARWICK ID: d1, d2,... 
+1. WARWICK ID: u5683200
 
 
 
@@ -34,7 +31,7 @@ library(ggplot2)
 library(viridis)
 library(hrbrthemes)
 library(RColorBrewer)
-wl <- read.csv("ECN_VW1.csv")
+wl <- read.csv("C:/Dev/year 1/Stats Moddeling/Final report/Data/Woodland.csv")
 ```
 
 
