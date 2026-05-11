@@ -1,0 +1,228 @@
+---
+title: "ST117 Individual DRAFT Written Report - Phase 2 Task 1 (Woodland Vegetation – Tree Measurements)"
+author: "My WARWICK ID 5685279 (Report Pod MS-05)"
+date: "2026-04-21" 
+output: pdf_document
+geometry: top=1cm, bottom=1cm
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(tidyr)
+library(knitr)
+library(ggplot2)
+library(lubridate)
+library(viridis)
+library(RColorBrewer)
+```
+
+This submission was created by:\
+1. u5685279
+
+# a)
+```{r a, fig.width=7, fig.height=5}
+
+library(dplyr)
+library(tidyr)
+
+wd <- read.csv("ECN_VW1.csv", stringsAsFactors = FALSE)
+
+wd_sub <- wd %>%
+  filter(FIELDNAME %in% c("DIAMETER", "HEIGHT", "DISTANCE", "NUM_STEMS")) %>%
+  select(SITECODE, SYEAR, TREE_SPEC, FIELDNAME, VALUE)
+
+wd_sub$VALUE <- suppressWarnings(as.numeric(wd_sub$VALUE))
+
+wd_wide <- wd_sub %>%
+  group_by(SITECODE, SYEAR, TREE_SPEC, FIELDNAME) %>%
+  summarise(VALUE = mean(VALUE, na.rm = TRUE), .groups = "drop") %>%
+  pivot_wider(names_from = FIELDNAME, values_from = VALUE)
+
+head(wd_wide, 3)
+```
+
+# b)
+Diameter was used as the predictor and height as the response because the EDA suggested a clear positive relationship between tree size variables, where larger diameters tend to correspond to taller trees. This makes biological sense and fits a simple linear regression framework for modelling structural growth patterns.
+```{r b}
+# Fit model
+model <- lm(HEIGHT ~ DIAMETER, data = wd_wide)
+
+# Create coefficient table
+coef_table <- as.data.frame(summary(model)$coefficients)
+colnames(coef_table) <- c("Estimate", "Std.Error", "t value", "Pr(>|t|)")
+
+# Improve spacing + readability
+coef_table <- round(coef_table, 4)
+
+# Print formatted table
+knitr::kable(
+  coef_table,
+  caption = "Linear regression of HEIGHT on DIAMETER",
+  align = "lcccc"
+)
+```
+
+# c)
+```{r c, fig.width=7, fig.height=5}
+
+library(dplyr)
+library(ggplot2)
+library(knitr)
+
+# Clean data
+wd_clean <- wd_wide %>%
+filter(!is.na(DIAMETER), !is.na(HEIGHT)) %>%
+filter(is.finite(DIAMETER), is.finite(HEIGHT)) %>%
+filter(HEIGHT > 0, DIAMETER > 0) %>%          # remove zeros
+filter(DIAMETER < 150)                        # remove extreme outliers
+
+# Overall model
+model_all <- lm(HEIGHT ~ DIAMETER, data = wd_clean)
+
+# Scatter plot
+ggplot(wd_clean, aes(x = DIAMETER, y = HEIGHT)) +
+geom_point(alpha = 0.4, colour = "darkgreen") +
+geom_smooth(method = "lm", colour = "black", se = TRUE) +
+labs(title = "Overall model: HEIGHT vs DIAMETER",
+x = "Diameter",
+y = "Height") +
+theme_minimal()
+
+# Residual plot
+ggplot(data.frame(fitted = fitted(model_all), resid = resid(model_all)),
+aes(x = fitted, y = resid)) +
+geom_point() +
+geom_hline(yintercept = 0, linetype = "dashed") +
+labs(title = "Residuals (overall model)") +
+theme_minimal()
+
+# Table
+coef_all <- as.data.frame(summary(model_all)$coefficients)
+coef_all <- round(coef_all, 4)
+kable(coef_all, caption = "Overall model")
+
+# Site models
+sites <- c("T05","T06","T08","T09")
+
+for(site in sites){
+
+data_site <- wd_clean %>% filter(SITECODE == site)
+
+model_site <- lm(HEIGHT ~ DIAMETER, data = data_site)
+
+# Scatter plot
+print(
+ggplot(data_site, aes(x = DIAMETER, y = HEIGHT)) +
+geom_point(alpha = 0.5, colour = "forestgreen") +
+geom_smooth(method = "lm", colour = "black", se = TRUE) +
+labs(title = paste("Site:", site),
+x = "Diameter",
+y = "Height") +
+theme_minimal()
+)
+
+# Residual plot
+print(
+ggplot(data.frame(fitted = fitted(model_site), resid = resid(model_site)),
+aes(x = fitted, y = resid)) +
+geom_point() +
+geom_hline(yintercept = 0, linetype = "dashed") +
+labs(title = paste("Residuals -", site)) +
+theme_minimal()
+)
+
+# Table
+coef_table <- as.data.frame(summary(model_site)$coefficients)
+coef_table <- round(coef_table, 4)
+
+print(kable(coef_table, caption = paste("Model for", site)))
+
+}
+```
+
+# d)
+Different sites show features that make a simple linear model a bit shaky.
+
+At T05, there are several very small or zero height values, which look unrealistic and create a strong cluster near zero. This leads to heteroscedasticity and weakens the linear relationship. Removing these values improves the speed and makes the linear trend clearer.
+
+At T06, the main issue is very small sample size. With so few observations, the fitted regression line is unstable and has high variance, so a simple linear model is not really reliable here. In this case, it's better to acknowledge the limitation rather than overfit.
+
+At T08, there are some large diameter values acting as outliers, which have high leverage and pull the regression line upwards. Filtering extreme values (e.g very large diameters) reduce their influence and results in a more representative fit for the majority of the data.
+
+At T09, the spread of residuals increase with diameter, suggesting heteroscedasticity. A log transformation of the variables stabilises the variance and makes the relationship more linear. This improves model assumptions and produces a tighter fit.
+
+Overall, these adjustments improve model fit by reducing bias from outliers, addressing heteroscedasticity, and ensuring the assumptions of linear regression (constant variance and linearity) are better met.
+```{r d, fig.width=7, fig.height=5}
+
+library(dplyr)
+library(ggplot2)
+library(knitr)
+
+# Base cleaned data (from part c)
+wd_clean <- wd_wide %>%
+  filter(!is.na(DIAMETER), !is.na(HEIGHT)) %>%
+  filter(is.finite(DIAMETER), is.finite(HEIGHT)) %>%
+  filter(DIAMETER > 0, HEIGHT > 0)
+
+sites <- c("T05","T06","T08","T09")
+
+# T05: Remove zero / unrealistic heights
+wd_T05 <- wd_clean %>%
+  filter(SITECODE == "T05", HEIGHT > 1)
+
+model_T05 <- lm(HEIGHT ~ DIAMETER, data = wd_T05)
+
+ggplot(wd_T05, aes(DIAMETER, HEIGHT)) +
+  geom_point(colour="forestgreen", alpha=0.5) +
+  geom_smooth(method="lm", colour="black") +
+  ggtitle("T05 (cleaned: removed near-zero heights)") +
+  theme_minimal()
+
+kable(round(as.data.frame(summary(model_T05)$coefficients),4),
+      caption="T05 refitted model")
+
+# T06: Keep but note limitation
+
+wd_T06 <- wd_clean %>% filter(SITECODE == "T06")
+
+model_T06 <- lm(HEIGHT ~ DIAMETER, data = wd_T06)
+
+ggplot(wd_T06, aes(DIAMETER, HEIGHT)) +
+  geom_point(colour="orange", alpha=0.6) +
+  geom_smooth(method="lm", colour="black") +
+  ggtitle("T06 (small sample size)") +
+  theme_minimal()
+
+kable(round(as.data.frame(summary(model_T06)$coefficients),4),
+      caption="T06 model (interpret cautiously)")
+
+# T08: Remove high-leverage outliers
+
+wd_T08 <- wd_clean %>%
+  filter(SITECODE == "T08", DIAMETER < 150)
+
+model_T08 <- lm(HEIGHT ~ DIAMETER, data = wd_T08)
+
+ggplot(wd_T08, aes(DIAMETER, HEIGHT)) +
+  geom_point(colour="blue", alpha=0.5) +
+  geom_smooth(method="lm", colour="black") +
+  ggtitle("T08 (outliers removed)") +
+  theme_minimal()
+
+kable(round(as.data.frame(summary(model_T08)$coefficients),4),
+      caption="T08 refitted model")
+
+# T09: Log transformation (fix heteroscedasticity)
+wd_T09 <- wd_clean %>% filter(SITECODE == "T09")
+
+model_T09 <- lm(log(HEIGHT) ~ log(DIAMETER), data = wd_T09)
+
+ggplot(wd_T09, aes(log(DIAMETER), log(HEIGHT))) +
+  geom_point(colour="purple", alpha=0.5) +
+  geom_smooth(method="lm", colour="black") +
+  ggtitle("T09 (log-transformed)") +
+  theme_minimal()
+
+kable(round(as.data.frame(summary(model_T09)$coefficients),4),
+      caption="T09 log-transformed model")
+```
