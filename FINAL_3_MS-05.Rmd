@@ -1,26 +1,10 @@
 ---
-title: "ST117 Final Written Report - Phase 2 Task 3 (Woodland vegetation - Butterflies and Moths)"
-author: "Report Pod MS-05"
-date: "2026-05-11" 
+title: "ST117 Individual DRAFT Written Report - Phase 2 Task 3 (Woodland vegetation - Butterflies and Moths)"
+author: "My WARWICK ID 5685279 (Report Pod MS-05)"
+date: "2026-04-22" 
 output: pdf_document
 geometry: top=1cm, bottom=1cm
 ---
-
-- Please replace XY-ab in filename.  
-- Please replace XY-ab, and 1999-12-31 in the header.  
-- Please read the document "WR Assessment, Style, and Submission Guidance" (see Moodle).  
-- By submitting this assignment, you confirm that you have read and will adhere to the guidance on AI set out in that document.  
-- Remember that you are responsible for everything that you submit.  
-- Please adhere to Word, page, figure, and table limits. 
-- Note that 20% of the total credit is dedicated to style.
-- Please include R code in both Rmd and pdf files.
-
-# Contributions
-
-This submission was created by: 
-1. WARWICK ID u5685279
-
-
 ```{r setup, include=FALSE}
 library(dplyr)
 library(tidyr)
@@ -189,17 +173,11 @@ ggplot(mt_agg, aes(x = unique_species, y = total_moths,
 # c)
 Two clear issues stand out for fitting a simple linear regression.
 
-First there is strong heteroscedasticity. The spread of butterfly and moth counts increase species richness changes, especially for lower
-richness values where counts vary widely. This violates the constant variance assumption of linear regression, meaning the model errors are 
-not evenly distributed. As a result, standard errors and inference from the model would be unreliable.
+First there is strong heteroscedasticity. The spread of butterfly and moth counts increase species richness changes, especially for lower richness values where counts vary widely. This violates the constant variance assumption of linear regression, meaning the model errors are not evenly distributed. As a result, standard errors and inference from the model would be unreliable.
 
-Second, there is clear clustering and limited variation in the predictor. Most observations are concentrated at just a few values of vegetation
-richness (around 3 and 7), rather than being spread continuously. This creates effectively grouped data rather than a true continuous 
-relationship, making it difficult for a linear model to capture a meaningful trend. It also suggest potential confounding by site, since 
-richness is largely site-driven, while counts vary strongly by year.
+Second, there is clear clustering and limited variation in the predictor. Most observations are concentrated at just a few values of vegetation richness (around 3 and 7), rather than being spread continuously. This creates effectively grouped data rather than a true continuous relationship, making it difficult for a linear model to capture a meaningful trend. It also suggest potential confounding by site, since richness is largely site-driven, while counts vary strongly by year.
 
-Overall, these issues indicate that a simple linear regression is likely too simplistic, and the relationship may be better explained by site 
-effects or more flexible models.
+Overall, these issues indicate that a simple linear regression is likely too simplistic, and the relationship may be better explained by site effects or more flexible models.
 
 # d)
 
@@ -322,16 +300,10 @@ fit_table <- data.frame(
 kable(fit_table, digits = 4,
       caption = "Model fit comparison (R², Adjusted R², AIC)")
 ```
-The relationship between butterfly and moth counts was first explored using scatterplots. On the raw scale, there is a positive association, 
-but the spread of the points increases as the counts get larger, which suggests heteroscedasticity. There are also a few extreme values, 
-indicating potential outliers that could have a strong influence on the model fit.
+The relationship between butterfly and moth counts was first explored using scatterplots. On the raw scale, there is a positive association, but the spread of the points increases as the counts get larger, which suggests heteroscedasticity. There are also a few extreme values, indicating potential outliers that could have a strong influence on the model fit.
 
-A simple linear regression was initially fitted on the raw data. However, the assumptions of linear regression are not well satisfied here. 
-In particular, the variance of the residuals is not constant, and the relationship does not appear strictly linear, showing some curvature.
+A simple linear regression was initially fitted on the raw data. However, the assumptions of linear regression are not well satisfied here. In particular, the variance of the residuals is not constant, and the relationship does not appear strictly linear, showing some curvature.
 
-To improve the model, both variables were log-transformed. After transformation, the relationship appears much more linear and the spread of the 
-data is more consistent across the range of values. This suggests that the assumptions of linearity and homoscedasticity are better met.
+To improve the model, both variables were log-transformed. After transformation, the relationship appears much more linear and the spread of the data is more consistent across the range of values. This suggests that the assumptions of linearity and homoscedasticity are better met.
 
-The final model was therefore fitted using the log-transformed variables. This model provides a better fit to the data, and the slope can now 
-be interpreted in terms of proportional changes (i.e an elasticity). Overall, the log transformation improves the suitability of the linear 
-regression model for this type of ecological count data, which often shows skewness and non-constant variance.
+The final model was therefore fitted using the log-transformed variables. This model provides a better fit to the data, and the slope can now be interpreted in terms of proportional changes (i.e an elasticity). Overall, the log transformation improves the suitability of the linear regression model for this type of ecological count data, which often shows skewness and non-constant variance.
