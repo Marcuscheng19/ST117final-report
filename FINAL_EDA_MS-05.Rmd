@@ -1,148 +1,213 @@
 ---
-title: "ST117 Written Report - Phase 1 (EDA)"
-author: "Report Pod XY-ab"
-date: "1999-12-31" 
-output: pdf_document
-geometry: top=1cm, bottom=1cm
+title: "phase 1 task 1,2,5,6"
+output: html_document
+date: "2026-05-11"
 ---
 
-- Please replace XY-ab in filename.  
-- Please replace XY-ab, and 1999-12-31 in the header.  
-- Please read the document "WR Assessment, Style, and Submission Guidance" (see Moodle).  
-- By submitting this assignment, you confirm that you have read and will adhere to the guidance on AI set out in that document.  
-- Remember that you are responsible for everything that you submit.  
-- Please adhere to Word, page, figure, and table limits. 
-- Note that 20% of the total credit is dedicated to style.
-- Please include R code in both Rmd and pdf files.
-
-# Contributions
-
-This submission was created by (extend as needed):
-1. WARWICK ID: a1, a2,... 
-2. WARWICK ID: b1, b2,... 
-3. WARWICK ID: c1, c2,... 
-4. WARWICK ID: d1, d2,... 
-
-
-
 ```{r setup, include=FALSE}
-#Code to setup packages should go here, for example
-library(dplyr)
-library(tidyr)
-library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#task 2 VB
 library(ggplot2)
-```
 
+vb <- read.csv("ECN_VB1.csv", stringsAsFactors = FALSE)
 
-# Task 1: Context and study design
-*Limit for all dataset combined: 0.5 pages text in 11pt font with single line spacing.*
+ggplot(vb, aes(x = factor(SYEAR))) +
+  geom_bar(fill = "steelblue") +
+  labs(title = "Baseline vegetation: sampling over time",
+       x = "Year",
+       y = "Number of observations") +
+  theme_minimal()
+#task 2 VF
+library(ggplot2)
 
+fg <- read.csv("ECN_VF1.csv", stringsAsFactors = FALSE)
 
-# Task 2: Diagrams
-*The diagrams can be drawn by hand or created with suitable software.*
+ggplot(fg, aes(x = factor(SYEAR))) +
+  geom_bar(fill = "darkgreen") +
+  labs(title = "Fine-grain vegetation: sampling over time",
+       x = "Year",
+       y = "Number of observations") +
+  theme_minimal()
+#task 2 VW
+library(ggplot2)
 
-You may use the R chunks below, but replace the generic filenames with your own. Log 4 provides resources on R Markdown, including guidance on how to include image files (e.g. photographs).
+wd <- read.csv("ECN_VW1.csv", stringsAsFactors = FALSE)
 
-Remove the hashtags in the commands inside the chunks to run them.
+ggplot(wd, aes(x = factor(SYEAR))) +
+  geom_bar(fill = "forestgreen") +
+  labs(title = "Woodland vegetation: sampling over time",
+       x = "Year",
+       y = "Number of observations") +
+  theme_minimal()
+#task 2 IB
+library(ggplot2)
 
-## Fine-grain vegetation
-```{r Fine-grain data diagram, out.width='80%'}
-#knitr::include_graphics("mydiagram_fine-grain.png")
-```
+ib <- read.csv("ECN_IB1.csv", stringsAsFactors = FALSE)
 
-## Woodland
-```{r Woodland data diagram, out.width='80%'}
-#knitr::include_graphics("mydiagram_woodland.png")
-```
+ib$YEAR2 <- substr(ib$SDATE, nchar(ib$SDATE)-1, nchar(ib$SDATE))
+ib$YEAR <- ifelse(as.numeric(ib$YEAR2) > 50,
+                  1900 + as.numeric(ib$YEAR2),
+                  2000 + as.numeric(ib$YEAR2))
 
-## Baseline vegetation
-```{r Baseline vegetation data diagram, out.width='80%'}
-#knitr::include_graphics("mydiagram_baseline.png")
-```
+ggplot(ib, aes(x = factor(YEAR))) +
+  geom_bar(fill = "orange") +
+  labs(title = "Butterflies: sampling over time",
+       x = "Year",
+       y = "Number of observations") +
+  theme_minimal()
+#task 2 IM
+library(ggplot2)
 
-## Butterflies
-```{r Butterfly data diagram, out.width='80%'}
-#knitr::include_graphics("mydiagram_butterflies.png")
-```
+im <- read.csv("ECN_IM1.csv", stringsAsFactors = FALSE)
 
-## Moths
-```{r Moth data diagram, out.width='80%'}
-#knitr::include_graphics("mydiagram_moths.png")
-```
+im$YEAR2 <- substr(im$SDATE, nchar(im$SDATE)-1, nchar(im$SDATE))
+im$YEAR <- ifelse(as.numeric(im$YEAR2) > 50,
+                  1900 + as.numeric(im$YEAR2),
+                  2000 + as.numeric(im$YEAR2))
 
+ggplot(im, aes(x = factor(YEAR))) +
+  geom_bar(fill = "purple") +
+  labs(title = "Moths: sampling over time",
+       x = "Year",
+       y = "Number of observations") +
+  theme_minimal()
+#task 5
+fg <- read.csv("ECN_VF1.csv", stringsAsFactors = FALSE)
+wd <- read.csv("ECN_VW1.csv", stringsAsFactors = FALSE)
+bl <- read.csv("ECN_VB1.csv", stringsAsFactors = FALSE)
 
-# Task 3: Data quality assessment 
-*Limits per dataset: 0.5 pages text in 11pt font with single line spacing + 2 figures + 1 table.*
+fg$VALUE <- suppressWarnings(as.numeric(fg$VALUE))
+wd$VALUE <- suppressWarnings(as.numeric(wd$VALUE))
+bl$VALUE <- suppressWarnings(as.numeric(bl$VALUE))
 
-## Fine-grain vegetation
-```{r Fine-grain DQA}
+fg$YEAR <- suppressWarnings(as.numeric(fg$SYEAR))
+wd$YEAR <- suppressWarnings(as.numeric(wd$SYEAR))
+bl$YEAR <- suppressWarnings(as.numeric(bl$SYEAR))
 
-```
+fg <- fg[!is.na(fg$VALUE) & !is.na(fg$YEAR), ]
+wd <- wd[!is.na(wd$VALUE) & !is.na(wd$YEAR), ]
+bl <- bl[!is.na(bl$VALUE) & !is.na(bl$YEAR), ]
 
-## Woodland
-```{r Woodland DQA}
+common_years <- Reduce(intersect, list(unique(fg$YEAR),
+                                       unique(wd$YEAR),
+                                       unique(bl$YEAR)))
 
-```
+fg_sub <- fg[fg$YEAR %in% common_years, ]
+wd_sub <- wd[wd$YEAR %in% common_years, ]
+bl_sub <- bl[bl$YEAR %in% common_years, ]
 
-## Baseline vegetation
-```{r Baseline DQA}
+fg_log <- log1p(fg_sub$VALUE)
+wd_log <- log1p(wd_sub$VALUE)
+bl_log <- log1p(bl_sub$VALUE)
 
-```
+fg_log <- fg_log[is.finite(fg_log)]
+wd_log <- wd_log[is.finite(wd_log)]
+bl_log <- bl_log[is.finite(bl_log)]
 
-## Butterflies
-```{r Butterfly DQA}
+d_fg <- density(fg_log)
+d_wd <- density(wd_log)
+d_bl <- density(bl_log)
 
-```
+par(mar = c(5.2, 5.2, 4.2, 2.2))
 
-## Moths
-```{r Moth DQA}
+plot(d_fg,
+     col = "darkgreen",
+     lwd = 2,
+     main = "Vegetation comparison (log scale)",
+     xlab = "log(VALUE + 1)",
+     ylab = "Density",
+     xlim = c(0, 9.4),
+     ylim = c(0, 0.48),
+     cex.main = 1.5,
+     cex.lab = 1.3,
+     cex.axis = 1.1)
 
-```
+lines(d_wd, col = "brown", lwd = 2)
+lines(d_bl, col = "blue", lwd = 2)
 
+legend("topright",
+       legend = c("Fine–grain", "Woodland", "Baseline"),
+       col = c("darkgreen", "brown", "blue"),
+       lwd = 2,
+       bty = "o",
+       cex = 1.2)
+#task 6
+bf <- read.csv("ECN_IB1.csv", stringsAsFactors = FALSE)
+mt <- read.csv("ECN_IM1.csv", stringsAsFactors = FALSE)
 
-# Task 4: Exploratory data analysis 
-*Limits per dataset: 0.5 pages text in 11pt font with single line spacing + 4 figures + 1 table.*
+bf$VALUE <- suppressWarnings(as.numeric(bf$VALUE))
+mt$VALUE <- suppressWarnings(as.numeric(mt$VALUE))
 
-## Fine-grain vegetation
-```{r Fine-grain EDA}
+bf <- bf[!is.na(bf$VALUE), ]
+mt <- mt[!is.na(mt$VALUE), ]
 
-```
+bf <- bf[bf$FIELDNAME != "XX", ]
 
-## Woodland
-```{r Woodland EDA}
+mt <- mt[!grepl("^Q", mt$FIELDNAME) & mt$FIELDNAME != "XX", ]
 
-```
+bf$DATE <- as.Date(bf$SDATE, format = "%d-%b-%y")
+mt$DATE <- as.Date(mt$SDATE, format = "%d-%b-%y")
 
-## Baseline vegetation
-```{r Baseline EDA}
+bf$YEAR  <- as.numeric(format(bf$DATE, "%Y"))
+bf$MONTH <- as.numeric(format(bf$DATE, "%m"))
 
-```
+mt$YEAR  <- as.numeric(format(mt$DATE, "%Y"))
+mt$MONTH <- as.numeric(format(mt$DATE, "%m"))
 
-## Butterflies
-```{r Butterfly EDA}
+bf <- bf[!is.na(bf$YEAR) & !is.na(bf$MONTH), ]
+mt <- mt[!is.na(mt$YEAR) & !is.na(mt$MONTH), ]
 
-```
+bf <- bf[bf$YEAR >= 2000 & bf$YEAR <= 2010, ]
+mt <- mt[mt$YEAR >= 2000 & mt$YEAR <= 2010, ]
 
-## Moths
-```{r Moth EDA}
+common_sites <- intersect(unique(bf$SITECODE), unique(mt$SITECODE))
 
-```
+bf <- bf[bf$SITECODE %in% common_sites, ]
+mt <- mt[mt$SITECODE %in% common_sites, ]
 
+bf <- bf[bf$MONTH >= 4 & bf$MONTH <= 9, ]
+mt <- mt[mt$MONTH >= 4 & mt$MONTH <= 9, ]
 
-# Task 5: Cross-data comparison for vegetation 
-*Limits: 200 words text + 1 figure + 1 table.*
+bf_daily <- aggregate(VALUE ~ SITECODE + DATE + MONTH, data = bf, sum, na.rm = TRUE)
+mt_daily <- aggregate(VALUE ~ SITECODE + DATE + MONTH, data = mt, sum, na.rm = TRUE)
 
-## Vegetation
-```{r Vegetation}
+bf_month <- aggregate(VALUE ~ MONTH, data = bf_daily, median, na.rm = TRUE)
+mt_month <- aggregate(VALUE ~ MONTH, data = mt_daily, median, na.rm = TRUE)
 
-```
+all_months <- data.frame(MONTH = 4:9)
+bf_month <- merge(all_months, bf_month, by = "MONTH", all.x = TRUE)
+mt_month <- merge(all_months, mt_month, by = "MONTH", all.x = TRUE)
 
-# Task 6: Cross-data comparison for invertebrates
-*Limits: 200 words text + 1 figure + 1 table.*
+bf_month$NORM <- bf_month$VALUE / max(bf_month$VALUE, na.rm = TRUE)
+mt_month$NORM <- mt_month$VALUE / max(mt_month$VALUE, na.rm = TRUE)
 
-## Invertebrates
-```{r Invertebrates}
+print(bf_month)
+print(mt_month)
 
-```
+plot(bf_month$MONTH, bf_month$NORM,
+     type = "o",
+     pch = 16,
+     lwd = 2,
+     col = "steelblue",
+     ylim = c(0.12, 1.05),
+     xaxt = "n",
+     xlab = "Month",
+     ylab = "Median abundance (normalized to 1)",
+     main = "Normalized seasonal profiles: butterflies vs moths")
 
+axis(1, at = 4:9, labels = 4:9)
 
+lines(mt_month$MONTH, mt_month$NORM,
+      type = "o",
+      pch = 16,
+      lwd = 2,
+      col = "darkorange")
+
+legend("topleft",
+       legend = c("Butterflies (IB)", "Moths (IM, Apr-Sep)"),
+       col = c("steelblue", "darkorange"),
+       lwd = 2,
+       pch = 16,
+       bty = "n")
