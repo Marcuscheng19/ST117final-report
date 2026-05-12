@@ -27,7 +27,7 @@ library(RColorBrewer)
 # a)
 *Limit: 150 words + 6 figures*
 
-```{r a,warning=FALSE}
+```{r a,warning=FALSE,message=FALSE}
 
 library(here)
 
@@ -89,7 +89,7 @@ The diamond backed moth is most prevalent in T06, mostly spotted around weeks 24
 # b)
 *Limit: 150 words + 1 figure*
 
-```{r b,warning=FALSE}
+```{r b,warning=FALSE,message=FALSE}
 #adds the data about flightwindow to the original moths dataframe
 moths1 = moths1%>%
   left_join(moths1 %>%
@@ -132,7 +132,7 @@ $s^2=\frac{r(1-p)}{p^2}$
 $p=\frac{\bar{x}}{s^2}$
 and $\hat{r}=\frac{\bar{x}^2}{s^2-\bar{x}}$
 
-```{r c,warning=FALSE}
+```{r c,warning=FALSE,message=FALSE}
 #filters so only flight windows of 2 weeks or longer are counted
 moths1filtered=mothplot%>%
   filter(flightwindow>=2)

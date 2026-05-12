@@ -1,6 +1,6 @@
 ---
 title: "ST117 Individual DRAFT Written Report - Phase 2 Task 1 (Woodland Vegetation – Tree Measurements)"
-author: "My WARWICK ID 5685279 (Report Pod MS-05)"
+author: "Report Pod MS-05"
 date: "2026-04-21" 
 output: pdf_document
 geometry: top=1cm, bottom=1cm
@@ -20,6 +20,8 @@ This submission was created by:\
 1. u5685279
 
 # a)
+*include an output of three rows*
+
 ```{r a, fig.width=7, fig.height=5}
 
 library(dplyr)
@@ -42,6 +44,8 @@ head(wd_wide, 3)
 ```
 
 # b)
+*Limit: 50 words + 1 table.*
+
 Diameter was used as the predictor and height as the response because the EDA suggested a clear positive relationship between tree size variables, where larger diameters tend to correspond to taller trees. This makes biological sense and fits a simple linear regression framework for modelling structural growth patterns.
 ```{r b}
 # Fit model
@@ -63,6 +67,8 @@ knitr::kable(
 ```
 
 # c)
+*Limit: 400 words + 10 figures + 5 tables*
+
 ```{r c, fig.width=7, fig.height=5}
 
 library(dplyr)
@@ -141,6 +147,8 @@ print(kable(coef_table, caption = paste("Model for", site)))
 ```
 
 # d)
+*Limit: 300 words + 4 figures + 4 tables*
+
 Different sites show features that make a simple linear model a bit shaky.
 
 At T05, there are several very small or zero height values, which look unrealistic and create a strong cluster near zero. This leads to heteroscedasticity and weakens the linear relationship. Removing these values improves the speed and makes the linear trend clearer.
