@@ -1,0 +1,985 @@
+{
+"@context": "https://w3id.org/ro/crate/1.2/context",
+"@graph": [
+{
+"@type": "CreativeWork",
+"@id": "ro-crate-metadata.json",
+"conformsTo": { "@id": "https://w3id.org/ro/crate/1.2" },
+"about": { "@id": "https://catalogue.ceh.ac.uk/id/a7b49ac1-24f5-406e-ac8f-3d05fb583e3b" }
+},
+{
+"@type":"Dataset",
+"name":"UK Environmental Change Network (ECN) baseline vegetation data: 1991-2000",
+"@id": "https://catalogue.ceh.ac.uk/id/a7b49ac1-24f5-406e-ac8f-3d05fb583e3b",
+"identifier": {"@id": "https://doi.org/10.5285/a7b49ac1-24f5-406e-ac8f-3d05fb583e3b"},
+"creditText":"Rennie, S., Adamson, J., Anderson, R., Andrews, C., Bater, J., Bayfield, N., Beaton, K., Beaumont, D., Benham, S., Bowmaker, V., Britt, C., Brooker, R., Brooks, D., Brunt, J., Common, G., Cooper, R., Corbett, S., Critchley, N., Dennis, P., Dick, J., Dodd, B., Dodd, N., Donovan, N., Easter, J., Eaton, E., Flexen, M., Gardiner, A., Hamilton, D., Hargreaves, P., Hatton-Ellis, M., Howe, M., Kahl, J., Lane, M., Langan, S., Lloyd, D., McElarney, Y., McKenna, C., McMillan, S., Milne, F., Milne, L., Morecroft, M., Murphy, M., Nelson, A., Nicholson, H., Pallett, D., Parry, D., Pearce, I., Pozsgai, G., Rose, R., Schafer, S., Scott, T., Sherrin, L., Shortall, C., Smith, R., Smith, P., Tait, R., Taylor, C., Taylor, M., Thurlow, M., Turner, A., Tyson, K., Watson, H., Whittaker, M. (2016). UK Environmental Change Network (ECN) baseline vegetation data: 1991-2000. NERC Environmental Information Data Centre. (Dataset). https://doi.org/10.5285/a7b49ac1-24f5-406e-ac8f-3d05fb583e3b",
+"hasPart": [
+{"@id":
+"data/ECN_VB1.csv"
+} ,
+{"@id":
+"supporting-documents/ECN_VB2.csv"
+} ,
+{"@id":
+"supporting-documents/VB_DATA_STRUCTURE.rtf"
+} ,
+{"@id":
+"supporting-documents/V.pdf"
+} ],
+"description":"Baseline Vegetation data from the UK Environmental Change Network (ECN) terrestrial sites. These data are collected at all of ECN's terrestrial sites using a standard protocol (see supporting documentation). This was a one-off whole site baseline vegetation survey (though given the intensive nature of this survey, some sites did it over successive years) to generate a vegetation map and identify the areas within the site to be monitored. In this protocol up to 500 systemic 2m x 2m plots were surveyed and species presence recorded. ECN is the UK's long-term environmental monitoring programme. It is a multi-agency programme sponsored by a consortium of fourteen government departments and agencies. These organisations contribute to the programme through funding either site monitoring and/or network co-ordination activities. These organisations are: Agri-Food and Biosciences Institute, Biotechnology and Biological Sciences Research Council, Cyfoeth Naturiol Cymru - Natural Resources Wales, Defence Science & Technology Laboratory, Department for Environment, Food and Rural Affairs, Environment Agency, Forestry Commission, Llywodraeth Cymru - Welsh Government, Natural England, Natural Environment Research Council, Northern Ireland Environment Agency, Scottish Environment Protection Agency, Scottish Government and Scottish Natural Heritage.",
+"isAccessibleForFree": true,
+"dateCreated":"2015-11-18",
+"datePublished":"2016-04-22",
+"keywords": [
+"Alice Holt"
+,
+"Drayton"
+,
+"Glensaugh"
+,
+"Hillsborough"
+,
+"National Vegetation Classification"
+,
+"North Wyke"
+,
+"NVC"
+,
+"Rothamsted"
+,
+"Sourhope"
+,
+"vascular plants"
+,
+"Wytham"
+,
+"Yr Wyddfa - Snowdon"
+,
+{"@type": "DefinedTerm","@id": "http://sws.geonames.org/10104113","name": "Cairngorms","inDefinedTermSet": "https://www.geonames.org/" }
+,
+{"@type": "DefinedTerm","@id": "http://sws.geonames.org/2635167","name": "United Kingdom","inDefinedTermSet": "https://www.geonames.org/" }
+,
+{"@type": "DefinedTerm","@id": "http://sws.geonames.org/2640010","name": "Porton Down","inDefinedTermSet": "https://www.geonames.org/" }
+,
+{"@type": "DefinedTerm","@id": "http://sws.geonames.org/2642279","name": "Moor House - Upper Teesdale","inDefinedTermSet": "https://www.geonames.org/" }
+,
+{"@type": "DefinedTerm","@id": "http://www.eionet.europa.eu/gemet/concept/1023","name": "bryophyte","inDefinedTermSet": "https://www.eionet.europa.eu/gemet/" }
+,
+{"@type": "DefinedTerm","@id": "http://www.eionet.europa.eu/gemet/concept/4799","name": "lichen","inDefinedTermSet": "https://www.eionet.europa.eu/gemet/" }
+],
+"creator": [
+{"@id": "https://orcid.org/0000-0002-0027-0436"},
+{"@id": "#creator1"},
+{"@id": "#creator2"},
+{"@id": "#creator3"},
+{"@id": "#creator4"},
+{"@id": "#creator5"},
+{"@id": "#creator6"},
+{"@id": "#creator7"},
+{"@id": "#creator8"},
+{"@id": "#creator9"},
+{"@id": "#creator10"},
+{"@id": "#creator11"},
+{"@id": "#creator12"},
+{"@id": "#creator13"},
+{"@id": "#creator14"},
+{"@id": "#creator15"},
+{"@id": "#creator16"},
+{"@id": "#creator17"},
+{"@id": "#creator18"},
+{"@id": "https://orcid.org/0000-0002-4180-9338"},
+{"@id": "#creator20"},
+{"@id": "#creator21"},
+{"@id": "#creator22"},
+{"@id": "#creator23"},
+{"@id": "#creator24"},
+{"@id": "#creator25"},
+{"@id": "#creator26"},
+{"@id": "#creator27"},
+{"@id": "#creator28"},
+{"@id": "#creator29"},
+{"@id": "#creator30"},
+{"@id": "#creator31"},
+{"@id": "#creator32"},
+{"@id": "https://orcid.org/0000-0003-0742-3658"},
+{"@id": "#creator34"},
+{"@id": "#creator35"},
+{"@id": "#creator36"},
+{"@id": "#creator37"},
+{"@id": "#creator38"},
+{"@id": "#creator39"},
+{"@id": "#creator40"},
+{"@id": "#creator41"},
+{"@id": "#creator42"},
+{"@id": "#creator43"},
+{"@id": "#creator44"},
+{"@id": "#creator45"},
+{"@id": "#creator46"},
+{"@id": "https://orcid.org/0000-0002-2300-6558"},
+{"@id": "#creator48"},
+{"@id": "#creator49"},
+{"@id": "#creator50"},
+{"@id": "#creator51"},
+{"@id": "#creator52"},
+{"@id": "#creator53"},
+{"@id": "#creator54"},
+{"@id": "#creator55"},
+{"@id": "#creator56"},
+{"@id": "#creator57"},
+{"@id": "#creator58"},
+{"@id": "#creator59"},
+{"@id": "#creator60"},
+{"@id": "#creator61"},
+{"@id": "#creator62"}
+],
+"contactPoint": [
+{"@id": "#contact0"}
+],
+"@reverse": {
+"citation":[
+{"@id": "https://doi.org/10.5194/essd-12-87-2020"}
+]
+},
+"temporalCoverage":[
+"1991-01-01/2000-12-31" ],
+"spatialCoverage": [ {"@id": "#bbox0"}],
+"license": "https://eidc.ac.uk/licences/ecn/plain",
+"distribution": [ {"@id": "#distribution0"}],
+"publisher":{"@id":"https://ror.org/04xw4m193"},
+"provider" : {"@id":"https://ror.org/04xw4m193"},
+"includedInDataCatalog":{ "@id": "#eidc-dataCatalogue"}
+},
+{
+"@id": "#eidc-dataCatalogue",
+"@type":"DataCatalog",
+"name":"Environmental Information Data Centre",
+"alternateName":"EIDC",
+"url":"https://catalogue.ceh.ac.uk/eidc/documents"
+},
+{
+"@id": "https://ror.org/04xw4m193",
+"@type":"Organization",
+"name":"NERC EDS Environmental Information Data Centre",
+"email": "info@eidc.ac.uk"
+}
+,{
+"@id": "https://doi.org/10.5285/a7b49ac1-24f5-406e-ac8f-3d05fb583e3b",
+"@type":"PropertyValue",
+"propertyID": "https://registry.identifiers.org/registry/doi",
+"value": "doi:10.5285/a7b49ac1-24f5-406e-ac8f-3d05fb583e3b",
+"url": "https://doi.org/10.5285/a7b49ac1-24f5-406e-ac8f-3d05fb583e3b"
+}
+, {
+"@id": "#bbox0",
+"@type":"Place",
+"geo": {
+"@id": "#geoshape0"
+}
+},
+{
+"@id": "#geoshape0",
+"@type": "GeoShape",
+"box":"-8.648 49.864, 1.768 60.861"
+}
+,
+{
+"@id": "https://orcid.org/0000-0002-0027-0436",
+"@type": "Person",
+"name": "Rennie, S."
+, "familyName": "Rennie"
+, "givenName": "S."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/00pggkr55"
+}
+},
+{
+"@id": "#creator1",
+"@type": "Person",
+"name": "Adamson, J."
+, "familyName": "Adamson"
+, "givenName": "J."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/00pggkr55"
+}
+},
+{
+"@id": "#creator2",
+"@type": "Person",
+"name": "Anderson, R."
+, "familyName": "Anderson"
+, "givenName": "R."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/05c5y5q11"
+}
+},
+{
+"@id": "#creator3",
+"@type": "Person",
+"name": "Andrews, C."
+, "familyName": "Andrews"
+, "givenName": "C."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/00pggkr55"
+}
+},
+{
+"@id": "#creator4",
+"@type": "Person",
+"name": "Bater, J."
+, "familyName": "Bater"
+, "givenName": "J."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/0347fy350"
+}
+},
+{
+"@id": "#creator5",
+"@type": "Person",
+"name": "Bayfield, N."
+, "familyName": "Bayfield"
+, "givenName": "N."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/00pggkr55"
+}
+},
+{
+"@id": "#creator6",
+"@type": "Person",
+"name": "Beaton, K."
+, "familyName": "Beaton"
+, "givenName": "K."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/03rzp5127"
+}
+},
+{
+"@id": "#creator7",
+"@type": "Person",
+"name": "Beaumont, D."
+, "familyName": "Beaumont"
+, "givenName": "D."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/0347fy350"
+}
+},
+{
+"@id": "#creator8",
+"@type": "Person",
+"name": "Benham, S."
+, "familyName": "Benham"
+, "givenName": "S."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/03wcc3744"
+}
+},
+{
+"@id": "#creator9",
+"@type": "Person",
+"name": "Bowmaker, V."
+, "familyName": "Bowmaker"
+, "givenName": "V."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/04x65hs26"
+}
+},
+{
+"@id": "#creator10",
+"@type": "Person",
+"name": "Britt, C."
+, "familyName": "Britt"
+, "givenName": "C."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/006d11e04"
+}
+},
+{
+"@id": "#creator11",
+"@type": "Person",
+"name": "Brooker, R."
+, "familyName": "Brooker"
+, "givenName": "R."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/00pggkr55"
+}
+},
+{
+"@id": "#creator12",
+"@type": "Person",
+"name": "Brooks, D."
+, "familyName": "Brooks"
+, "givenName": "D."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/0347fy350"
+}
+},
+{
+"@id": "#creator13",
+"@type": "Person",
+"name": "Brunt, J."
+, "familyName": "Brunt"
+, "givenName": "J."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/03wcc3744"
+}
+},
+{
+"@id": "#creator14",
+"@type": "Person",
+"name": "Common, G."
+, "familyName": "Common"
+, "givenName": "G."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/03rzp5127"
+}
+},
+{
+"@id": "#creator15",
+"@type": "Person",
+"name": "Cooper, R."
+, "familyName": "Cooper"
+, "givenName": "R."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/03rzp5127"
+}
+},
+{
+"@id": "#creator16",
+"@type": "Person",
+"name": "Corbett, S."
+, "familyName": "Corbett"
+, "givenName": "S."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/006d11e04"
+}
+},
+{
+"@id": "#creator17",
+"@type": "Person",
+"name": "Critchley, N."
+, "familyName": "Critchley"
+, "givenName": "N."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/006d11e04"
+}
+},
+{
+"@id": "#creator18",
+"@type": "Person",
+"name": "Dennis, P."
+, "familyName": "Dennis"
+, "givenName": "P."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/03rzp5127"
+}
+},
+{
+"@id": "https://orcid.org/0000-0002-4180-9338",
+"@type": "Person",
+"name": "Dick, J."
+, "familyName": "Dick"
+, "givenName": "J."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/00pggkr55"
+}
+},
+{
+"@id": "#creator20",
+"@type": "Person",
+"name": "Dodd, B."
+, "familyName": "Dodd"
+, "givenName": "B."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/00pggkr55"
+}
+},
+{
+"@id": "#creator21",
+"@type": "Person",
+"name": "Dodd, N."
+, "familyName": "Dodd"
+, "givenName": "N."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/03rzp5127"
+}
+},
+{
+"@id": "#creator22",
+"@type": "Person",
+"name": "Donovan, N."
+, "familyName": "Donovan"
+, "givenName": "N."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/0347fy350"
+}
+},
+{
+"@id": "#creator23",
+"@type": "Person",
+"name": "Easter, J."
+, "familyName": "Easter"
+, "givenName": "J."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/04x65hs26"
+}
+},
+{
+"@id": "#creator24",
+"@type": "Person",
+"name": "Eaton, E."
+, "familyName": "Eaton"
+, "givenName": "E."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/03wcc3744"
+}
+},
+{
+"@id": "#creator25",
+"@type": "Person",
+"name": "Flexen, M."
+, "familyName": "Flexen"
+, "givenName": "M."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/05c5y5q11"
+}
+},
+{
+"@id": "#creator26",
+"@type": "Person",
+"name": "Gardiner, A."
+, "familyName": "Gardiner"
+, "givenName": "A."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/00pggkr55"
+}
+},
+{
+"@id": "#creator27",
+"@type": "Person",
+"name": "Hamilton, D."
+, "familyName": "Hamilton"
+, "givenName": "D."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/03rzp5127"
+}
+},
+{
+"@id": "#creator28",
+"@type": "Person",
+"name": "Hargreaves, P."
+, "familyName": "Hargreaves"
+, "givenName": "P."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/0347fy350"
+}
+},
+{
+"@id": "#creator29",
+"@type": "Person",
+"name": "Hatton-Ellis, M."
+, "familyName": "Hatton-Ellis"
+, "givenName": "M."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/04x65hs26"
+}
+},
+{
+"@id": "#creator30",
+"@type": "Person",
+"name": "Howe, M."
+, "familyName": "Howe"
+, "givenName": "M."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/0347fy350"
+}
+},
+{
+"@id": "#creator31",
+"@type": "Person",
+"name": "Kahl, J."
+, "familyName": "Kahl"
+, "givenName": "J."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/00pggkr55"
+}
+},
+{
+"@id": "#creator32",
+"@type": "Person",
+"name": "Lane, M."
+, "familyName": "Lane"
+, "givenName": "M."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/00pggkr55"
+}
+},
+{
+"@id": "https://orcid.org/0000-0003-0742-3658",
+"@type": "Person",
+"name": "Langan, S."
+, "familyName": "Langan"
+, "givenName": "S."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/03rzp5127"
+}
+},
+{
+"@id": "#creator34",
+"@type": "Person",
+"name": "Lloyd, D."
+, "familyName": "Lloyd"
+, "givenName": "D."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/04x65hs26"
+}
+},
+{
+"@id": "#creator35",
+"@type": "Person",
+"name": "McElarney, Y."
+, "familyName": "McElarney"
+, "givenName": "Y."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/05c5y5q11"
+}
+},
+{
+"@id": "#creator36",
+"@type": "Person",
+"name": "McKenna, C."
+, "familyName": "McKenna"
+, "givenName": "C."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/05c5y5q11"
+}
+},
+{
+"@id": "#creator37",
+"@type": "Person",
+"name": "McMillan, S."
+, "familyName": "McMillan"
+, "givenName": "S."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/006d11e04"
+}
+},
+{
+"@id": "#creator38",
+"@type": "Person",
+"name": "Milne, F."
+, "familyName": "Milne"
+, "givenName": "F."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/03rzp5127"
+}
+},
+{
+"@id": "#creator39",
+"@type": "Person",
+"name": "Milne, L."
+, "familyName": "Milne"
+, "givenName": "L."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/00pggkr55"
+}
+},
+{
+"@id": "#creator40",
+"@type": "Person",
+"name": "Morecroft, M."
+, "familyName": "Morecroft"
+, "givenName": "M."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/00pggkr55"
+}
+},
+{
+"@id": "#creator41",
+"@type": "Person",
+"name": "Murphy, M."
+, "familyName": "Murphy"
+, "givenName": "M."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/04x65hs26"
+}
+},
+{
+"@id": "#creator42",
+"@type": "Person",
+"name": "Nelson, A."
+, "familyName": "Nelson"
+, "givenName": "A."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/05c5y5q11"
+}
+},
+{
+"@id": "#creator43",
+"@type": "Person",
+"name": "Nicholson, H."
+, "familyName": "Nicholson"
+, "givenName": "H."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/05c5y5q11"
+}
+},
+{
+"@id": "#creator44",
+"@type": "Person",
+"name": "Pallett, D."
+, "familyName": "Pallett"
+, "givenName": "D."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/00pggkr55"
+}
+},
+{
+"@id": "#creator45",
+"@type": "Person",
+"name": "Parry, D."
+, "familyName": "Parry"
+, "givenName": "D."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/04x65hs26"
+}
+},
+{
+"@id": "#creator46",
+"@type": "Person",
+"name": "Pearce, I."
+, "familyName": "Pearce"
+, "givenName": "I."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/00pggkr55"
+}
+},
+{
+"@id": "https://orcid.org/0000-0002-2300-6558",
+"@type": "Person",
+"name": "Pozsgai, G."
+, "familyName": "Pozsgai"
+, "givenName": "G."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/03rzp5127"
+}
+},
+{
+"@id": "#creator48",
+"@type": "Person",
+"name": "Rose, R."
+, "familyName": "Rose"
+, "givenName": "R."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/00pggkr55"
+}
+},
+{
+"@id": "#creator49",
+"@type": "Person",
+"name": "Schafer, S."
+, "familyName": "Schafer"
+, "givenName": "S."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/00pggkr55"
+}
+},
+{
+"@id": "#creator50",
+"@type": "Person",
+"name": "Scott, T."
+, "familyName": "Scott"
+, "givenName": "T."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/0347fy350"
+}
+},
+{
+"@id": "#creator51",
+"@type": "Person",
+"name": "Sherrin, L."
+, "familyName": "Sherrin"
+, "givenName": "L."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/00pggkr55"
+}
+},
+{
+"@id": "#creator52",
+"@type": "Person",
+"name": "Shortall, C."
+, "familyName": "Shortall"
+, "givenName": "C."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/0347fy350"
+}
+},
+{
+"@id": "#creator53",
+"@type": "Person",
+"name": "Smith, R."
+, "familyName": "Smith"
+, "givenName": "R."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/0347fy350"
+}
+},
+{
+"@id": "#creator54",
+"@type": "Person",
+"name": "Smith, P."
+, "familyName": "Smith"
+, "givenName": "P."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/00pggkr55"
+}
+},
+{
+"@id": "#creator55",
+"@type": "Person",
+"name": "Tait, R."
+, "familyName": "Tait"
+, "givenName": "R."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/03rzp5127"
+}
+},
+{
+"@id": "#creator56",
+"@type": "Person",
+"name": "Taylor, C."
+, "familyName": "Taylor"
+, "givenName": "C."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/03rzp5127"
+}
+},
+{
+"@id": "#creator57",
+"@type": "Person",
+"name": "Taylor, M."
+, "familyName": "Taylor"
+, "givenName": "M."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/00pggkr55"
+}
+},
+{
+"@id": "#creator58",
+"@type": "Person",
+"name": "Thurlow, M."
+, "familyName": "Thurlow"
+, "givenName": "M."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/00pggkr55"
+}
+},
+{
+"@id": "#creator59",
+"@type": "Person",
+"name": "Turner, A."
+, "familyName": "Turner"
+, "givenName": "A."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/04x65hs26"
+}
+},
+{
+"@id": "#creator60",
+"@type": "Person",
+"name": "Tyson, K."
+, "familyName": "Tyson"
+, "givenName": "K."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/0347fy350"
+}
+},
+{
+"@id": "#creator61",
+"@type": "Person",
+"name": "Watson, H."
+, "familyName": "Watson"
+, "givenName": "H."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/03rzp5127"
+}
+},
+{
+"@id": "#creator62",
+"@type": "Person",
+"name": "Whittaker, M."
+, "familyName": "Whittaker"
+, "givenName": "M."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@id": "https://ror.org/04x65hs26"
+}
+}
+,
+{
+"@id": "#contact0",
+"@type": "Person",
+"name": "Rennie, S."
+, "familyName": "Rennie"
+, "givenName": "S."
+,"email": "enquiries@ceh.ac.uk"
+,"affiliation":{
+"@type":"Organization",
+"name":"UK Environmental Change Network"
+}
+}
+, {
+"@id": "https://doi.org/10.5194/essd-12-87-2020",
+"@type": "CreativeWork"
+,"creditText": "Rennie, S., Andrews, C., Atkinson, S., Beaumont, D., Benham, S., Bowmaker, V., … Watson, H. (2020). The UK Environmental Change Network datasets - integrated and co-located data for long-term environmental research (1993-2015). Earth System Science Data, 12(1), 87–107."
+,"url": "https://doi.org/10.5194/essd-12-87-2020"
+}
+, {
+"@id":
+"data/ECN_VB1.csv"
+,"name": "ECN_VB1.csv","@type": "File"
+,"encodingFormat": "text/csv"
+,"sha256": "ce3296d839c2817a195a257fbbfd5508d2d606b114b9cf10d66a0976a3b422f9"
+,"lastModified": "2015-11-13T11:25:43"
+,"bytes": 1499999
+,"contentUrl": "data/ECN_VB1.csv"
+}
+, {
+"@id":
+"supporting-documents/ECN_VB2.csv"
+,"name": "ECN_VB2.csv","@type": "File"
+,"encodingFormat": "text/csv"
+,"sha256": "88ea2b4cfb2f22cde42a134e71d176e8507a00aac54ffdfa3cc68c39c09594c9"
+,"lastModified": "2019-09-04T12:21:43"
+,"bytes": 106282
+,"contentUrl": "supporting-documents/ECN_VB2.csv"
+}
+, {
+"@id":
+"supporting-documents/VB_DATA_STRUCTURE.rtf"
+,"name": "VB_DATA_STRUCTURE.rtf","@type": "File"
+,"sha256": "3cbab3754ca469ede195343fc13c47f8a42f034f47fbcb43f96b6d15b4152c37"
+,"lastModified": "2019-09-04T12:21:43"
+,"bytes": 3038068
+,"contentUrl": "supporting-documents/VB_DATA_STRUCTURE.rtf"
+}
+, {
+"@id":
+"supporting-documents/V.pdf"
+,"name": "V.pdf","@type": "File"
+,"encodingFormat": "application/pdf"
+,"sha256": "7c0a71e77cab9c5a7e9d8f5e5edc42b2dd6dceb94dc8fd0092ff3e0a1d83d0e6"
+,"lastModified": "2019-09-04T12:21:43"
+,"bytes": 91960
+,"contentUrl": "supporting-documents/V.pdf"
+}
+, {
+"@id": "#distribution0",
+"@type":"DataDownload",
+"contentUrl":"https://data-package.ceh.ac.uk/data/a7b49ac1-24f5-406e-ac8f-3d05fb583e3b"
+,"encodingFormat":"application/zip"
+}
+, {
+"@id": "https://ror.org/00pggkr55",
+"@type": "Organization",
+"name": "Centre for Ecology & Hydrology",
+"identifier": "https://ror.org/00pggkr55"
+},
+{
+"@id": "https://ror.org/05c5y5q11",
+"@type": "Organization",
+"name": "Agri-Food and Biosciences Institute",
+"identifier": "https://ror.org/05c5y5q11"
+},
+{
+"@id": "https://ror.org/0347fy350",
+"@type": "Organization",
+"name": "Rothamsted Research",
+"identifier": "https://ror.org/0347fy350"
+},
+{
+"@id": "https://ror.org/03rzp5127",
+"@type": "Organization",
+"name": "The James Hutton Institute",
+"identifier": "https://ror.org/03rzp5127"
+},
+{
+"@id": "https://ror.org/03wcc3744",
+"@type": "Organization",
+"name": "Forest Research",
+"identifier": "https://ror.org/03wcc3744"
+},
+{
+"@id": "https://ror.org/04x65hs26",
+"@type": "Organization",
+"name": "Cyfoeth Naturiol Cymru - Natural Resources Wales",
+"identifier": "https://ror.org/04x65hs26"
+},
+{
+"@id": "https://ror.org/006d11e04",
+"@type": "Organization",
+"name": "ADAS",
+"identifier": "https://ror.org/006d11e04"
+}
+]
+}

@@ -1,213 +1,670 @@
 ---
-title: "phase 1 task 1,2,5,6"
-output: html_document
-date: "2026-05-11"
+title: "ST117 Written Report - Phase 1 (EDA)"
+author: "Report Pod MS-05"
+date: "11-05-2026" 
+output: pdf_document
+geometry: top=1cm, bottom=1cm
 ---
 
+- Please replace XY-ab in filename.  
+- Please replace XY-ab, and 1999-12-31 in the header.  
+- Please read the document "WR Assessment, Style, and Submission Guidance" (see Moodle).  
+- By submitting this assignment, you confirm that you have read and will adhere to the guidance on AI set out in that document.  
+- Remember that you are responsible for everything that you submit.  
+- Please adhere to Word, page, figure, and table limits. 
+- Note that 20% of the total credit is dedicated to style.
+- Please include R code in both Rmd and pdf files.
+
+# Contributions
+
+This submission was created by (extend as needed):
+1. WARWICK ID:u5603360 1,2,5,6
+2. WARWICK ID:u5734835 3,4
+
+
+
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+#Code to setup packages should go here, for example
+library(dplyr)
+library(tidyr)
+library(knitr)
+library(ggplot2)
+library(patchwork)
+```
+load all datasets with same names so it all works as 1 and set working directory to file location
+```{r}
+setwd(".")
+FineGrain <- read.csv("C:/Dev/year 1/Stats Moddeling/Final report/Data/FineGrain.csv")
+head(FineGrain)
+FineGrain2 <- read.csv("Data/ECN_VF2.csv")
+ Baseline<- read.csv("C:/Dev/year 1/Stats Moddeling/Final report/Data/Baseline.csv")
+head(Baseline)
+
+Woodland <- read.csv("C:/Dev/year 1/Stats Moddeling/Final report/Data/Woodland.csv")
+head(Woodland)
+Butterflies<- read.csv("C:/Dev/year 1/Stats Moddeling/Final report/Data/Butterflies.csv")
+head(Butterflies)
+Moths <- read.csv("C:/Dev/year 1/Stats Moddeling/Final report/Data/Moths.csv")
+head(Moths)
 ```
 
-#task 2 VB
-library(ggplot2)
+# Task 1: Context and study design
+*Limit for all dataset combined: 0.5 pages text in 11pt font with single line spacing.*
 
-vb <- read.csv("ECN_VB1.csv", stringsAsFactors = FALSE)
+**The ECN datasets used in this project combine long-term monitoring of vegetation and invertebrates across terrestrial sites in the UK. Although all five datasets are intended to detect ecological change, they differ in what they measure and in the scale at which they operate. The vegetation datasets focus on plant community composition and structure, while the butterfly and moth datasets record animal abundance through repeated counts. Baseline vegetation (VB) provides an initial site-wide characterisation using 2 m × 2 m plots on a regular grid with additional infill points where needed. Fine-grain vegetation (VF) records species presence within randomly selected 40 cm × 40 cm cells inside 10 m × 10 m plots, giving much finer spatial detail. Woodland vegetation (VW) is more specialised and records tree and shrub species, dominance, seedling counts, height and diameter at breast height within 10 m × 10 m woodland plots. 
+The datasets also differ in sampling frequency. VB is mainly a baseline survey, VF is usually repeated every three years, and VW is sampled less often because it is designed to monitor slower structural change in woodland. In contrast, the invertebrate datasets are based on regular repeated counts. Butterflies (IB) are surveyed weekly along fixed transects divided into sections between April and September, while moths (IM) are recorded using standard light traps, usually on a nightly basis. These differences in timing reflect the ecological processes being measured, since vegetation generally changes more slowly than invertebrate abundance and activity. 
+The datasets are structured around different sampling units. Vegetation data are organised by site, plot and sometimes cell, butterfly data by site, transect location and section, and moth data by site, trap location and date. These structural differences mean that each dataset supports different ecological questions. The vegetation datasets are useful for studying community composition, habitat structure and spatial heterogeneity, whereas the invertebrate datasets are better suited to analysing abundance patterns, seasonality and temporal variation. Together, they provide a broader picture of ecological change across sites and years than any one dataset alone.
 
-ggplot(vb, aes(x = factor(SYEAR))) +
-  geom_bar(fill = "steelblue") +
-  labs(title = "Baseline vegetation: sampling over time",
-       x = "Year",
-       y = "Number of observations") +
-  theme_minimal()
-#task 2 VF
-library(ggplot2)
 
-fg <- read.csv("ECN_VF1.csv", stringsAsFactors = FALSE)
+# Task 2: Diagrams
+*The diagrams can be drawn by hand or created with suitable software.*
 
-ggplot(fg, aes(x = factor(SYEAR))) +
-  geom_bar(fill = "darkgreen") +
-  labs(title = "Fine-grain vegetation: sampling over time",
-       x = "Year",
-       y = "Number of observations") +
-  theme_minimal()
-#task 2 VW
-library(ggplot2)
+# Task 2: Study Design Diagrams
+## Fine Grain vegetation 
+ It has been thought more efficient statistically to use a
+relatively large number of small plots rather than a small number of
+larger plots. and it is easier to quantify presence of species as
+opposed to estimated cover and other more subjective and hard to measure
+phenoms. they use a 40 cm x 40 cm and Every 3 years sample from 10 random cells in the 10m by 10m plotID location randomly selected 
+```{r Fine-grain data diagram, out.width='80%'}
+knitr::include_graphics("C:/Dev/year 1/Stats Moddeling/Final report/Images/FineGrainDC.png")
+```
+Note also that when going to these places analysis is done of both the plot and rechords of how the individual cells may encounter sample biases . in the form of additional documents.
+## Baseline vegetation 
 
-wd <- read.csv("ECN_VW1.csv", stringsAsFactors = FALSE)
+### Brief description
+Baseline vegetation (VB) is a one-off baseline survey. Sampling is based on an approximately regular grid, with additional infill points where needed. The core spatial unit is a 2 m × 2 m plot.
 
-ggplot(wd, aes(x = factor(SYEAR))) +
-  geom_bar(fill = "forestgreen") +
-  labs(title = "Woodland vegetation: sampling over time",
-       x = "Year",
-       y = "Number of observations") +
-  theme_minimal()
-#task 2 IB
-library(ggplot2)
+```{r Baseline}
+plot.new()
+plot.window(xlim = c(0, 10), ylim = c(0, 6))
+title(main = "VB: baseline vegetation", font.main = 2, cex.main = 1.4)
 
-ib <- read.csv("ECN_IB1.csv", stringsAsFactors = FALSE)
+# Time
+text(0.6, 5.0, "Time", adj = 0, font = 2)
+arrows(1.2, 4.9, 3.8, 4.9, length = 0.08, lwd = 2)
+text(2.2, 5.25, "one-off survey", cex = 0.9)
 
-ib$YEAR2 <- substr(ib$SDATE, nchar(ib$SDATE)-1, nchar(ib$SDATE))
-ib$YEAR <- ifelse(as.numeric(ib$YEAR2) > 50,
-                  1900 + as.numeric(ib$YEAR2),
-                  2000 + as.numeric(ib$YEAR2))
+# Space
+text(0.6, 4.0, "Space", adj = 0, font = 2)
+rect(1.0, 1.6, 4.1, 3.6, lwd = 2)
+for(i in 1:4) lines(c(1.0 + i*0.62, 1.0 + i*0.62), c(1.6, 3.6))
+for(j in 1:2) lines(c(1.0, 4.1), c(1.6 + j*0.67, 1.6 + j*0.67))
+points(c(1.4, 3.5, 2.9), c(1.9, 3.1, 1.8), pch = 16, cex = 0.7)
+text(1.0, 1.2, "regular grid + infill points", adj = 0, cex = 0.8)
 
-ggplot(ib, aes(x = factor(YEAR))) +
-  geom_bar(fill = "orange") +
-  labs(title = "Butterflies: sampling over time",
-       x = "Year",
-       y = "Number of observations") +
-  theme_minimal()
-#task 2 IM
-library(ggplot2)
+rect(4.8, 2.0, 5.9, 3.1, lwd = 2)
+text(4.65, 3.35, "2 m x 2 m plot", adj = 0, cex = 0.8)
+arrows(4.1, 2.6, 4.8, 2.55, length = 0.08, lwd = 1.5)
 
-im <- read.csv("ECN_IM1.csv", stringsAsFactors = FALSE)
+# Table
+text(6.2, 4.0, "Table", adj = 0, font = 2)
+rect(6.1, 2.6, 9.0, 3.5, lwd = 2)
+text(6.3, 3.05, "site | year | plot | field | value", adj = 0, cex = 0.78)
+rect(6.1, 1.2, 9.0, 2.1, lwd = 2)
+text(6.3, 1.65, "site | year | plot | date | features", adj = 0, cex = 0.78)
+```
 
-im$YEAR2 <- substr(im$SDATE, nchar(im$SDATE)-1, nchar(im$SDATE))
-im$YEAR <- ifelse(as.numeric(im$YEAR2) > 50,
-                  1900 + as.numeric(im$YEAR2),
-                  2000 + as.numeric(im$YEAR2))
+## Woodland Vegetation
 
-ggplot(im, aes(x = factor(YEAR))) +
-  geom_bar(fill = "purple") +
-  labs(title = "Moths: sampling over time",
-       x = "Year",
-       y = "Number of observations") +
-  theme_minimal()
-#task 5
-fg <- read.csv("ECN_VF1.csv", stringsAsFactors = FALSE)
-wd <- read.csv("ECN_VW1.csv", stringsAsFactors = FALSE)
-bl <- read.csv("ECN_VB1.csv", stringsAsFactors = FALSE)
+### Brief description
+Woodland vegetation (VW) is used for woodland or scrub plots. It records tree and shrub species, seedlings, height and dbh within 10 m × 10 m woodland plots.
 
-fg$VALUE <- suppressWarnings(as.numeric(fg$VALUE))
-wd$VALUE <- suppressWarnings(as.numeric(wd$VALUE))
-bl$VALUE <- suppressWarnings(as.numeric(bl$VALUE))
+```{r Woodland}
+plot.new()
+plot.window(xlim = c(0, 10), ylim = c(0, 6))
+title(main = "VW: woodland vegetation", font.main = 2, cex.main = 1.4)
 
-fg$YEAR <- suppressWarnings(as.numeric(fg$SYEAR))
-wd$YEAR <- suppressWarnings(as.numeric(wd$SYEAR))
-bl$YEAR <- suppressWarnings(as.numeric(bl$SYEAR))
+# Time
+text(0.6, 5.0, "Time", adj = 0, font = 2)
+arrows(1.2, 4.9, 4.4, 4.9, length = 0.08, lwd = 2)
+xs <- c(1.6, 2.9, 4.2)
+labs <- c("Y1", "Y10", "Y19")
+for(i in 1:3){
+  lines(c(xs[i], xs[i]), c(4.8, 5.0), lwd = 2)
+  text(xs[i], 5.25, labs[i], cex = 0.85)
+}
+text(1.9, 4.45, "main survey every 9 years", adj = 0, cex = 0.85)
 
-fg <- fg[!is.na(fg$VALUE) & !is.na(fg$YEAR), ]
-wd <- wd[!is.na(wd$VALUE) & !is.na(wd$YEAR), ]
-bl <- bl[!is.na(bl$VALUE) & !is.na(bl$YEAR), ]
+# Space
+text(0.6, 4.0, "Space", adj = 0, font = 2)
+rect(1.0, 1.4, 4.2, 3.5, lwd = 2)
+text(1.45, 3.75, "10 m x 10 m woodland plot", adj = 0, cex = 0.8)
+pts <- matrix(c(1.4,1.8, 2.2,1.8, 3.0,1.9, 1.7,2.5, 2.6,2.6, 3.4,2.5), ncol = 2, byrow = TRUE)
+for(i in 1:nrow(pts)){
+  rect(pts[i,1], pts[i,2], pts[i,1]+0.18, pts[i,2]+0.18)
+  symbols(pts[i,1]+0.42, pts[i,2]+0.30, circles = 0.10, inches = FALSE, add = TRUE)
+}
+text(1.0, 1.0, "cells + nearest trees/shrubs", adj = 0, cex = 0.8)
 
-common_years <- Reduce(intersect, list(unique(fg$YEAR),
-                                       unique(wd$YEAR),
-                                       unique(bl$YEAR)))
+# Table
+text(6.0, 4.0, "Table", adj = 0, font = 2)
+rect(5.9, 2.5, 9.1, 3.6, lwd = 2)
+text(6.1, 3.05, "site | year | plot | cell | tree | field | value", adj = 0, cex = 0.73)
+rect(5.9, 1.2, 9.1, 2.0, lwd = 2)
+text(6.1, 1.6, "survey dates: dom / dbh / seed", adj = 0, cex = 0.78)
+```
 
-fg_sub <- fg[fg$YEAR %in% common_years, ]
-wd_sub <- wd[wd$YEAR %in% common_years, ]
-bl_sub <- bl[bl$YEAR %in% common_years, ]
+## Butterflies
 
-fg_log <- log1p(fg_sub$VALUE)
-wd_log <- log1p(wd_sub$VALUE)
-bl_log <- log1p(bl_sub$VALUE)
+### Brief description
+Butterflies (IB) are recorded along fixed transects divided into sections. Surveys are carried out weekly during the butterfly season.
 
-fg_log <- fg_log[is.finite(fg_log)]
-wd_log <- wd_log[is.finite(wd_log)]
-bl_log <- bl_log[is.finite(bl_log)]
+```{r Butterflies}
+plot.new()
+plot.window(xlim = c(0, 10), ylim = c(0, 6))
+title(main = "IB: butterflies", font.main = 2, cex.main = 1.4)
 
-d_fg <- density(fg_log)
-d_wd <- density(wd_log)
-d_bl <- density(bl_log)
+# Time
+text(0.6, 5.0, "Time", adj = 0, font = 2)
+arrows(1.2, 4.9, 4.8, 4.9, length = 0.08, lwd = 2)
+text(1.7, 5.25, "weekly, Apr-Sep", adj = 0, cex = 0.9)
 
-par(mar = c(5.2, 5.2, 4.2, 2.2))
+# Space
+text(0.6, 4.0, "Space", adj = 0, font = 2)
+lines(c(1.0, 4.4), c(2.4, 2.4), lwd = 2)
+for(x in c(1.0, 1.6, 2.2, 2.8, 3.4, 4.0)){
+  lines(c(x, x), c(2.15, 2.65), lwd = 1.2)
+}
+text(1.0, 2.9, "transect split into sections", adj = 0, cex = 0.8)
+rect(2.1, 1.5, 2.9, 2.3, lwd = 1.5)
+text(1.85, 1.1, "recording box", adj = 0, cex = 0.8)
 
-plot(d_fg,
-     col = "darkgreen",
-     lwd = 2,
-     main = "Vegetation comparison (log scale)",
-     xlab = "log(VALUE + 1)",
-     ylab = "Density",
-     xlim = c(0, 9.4),
-     ylim = c(0, 0.48),
-     cex.main = 1.5,
-     cex.lab = 1.3,
-     cex.axis = 1.1)
+# Table
+text(6.1, 4.0, "Table", adj = 0, font = 2)
+rect(6.0, 2.6, 9.1, 3.6, lwd = 2)
+text(6.2, 3.1, "site | loc | date | section | species | value", adj = 0, cex = 0.75)
+rect(6.0, 1.2, 9.1, 2.0, lwd = 2)
+text(6.2, 1.6, "survey info: weather / recorder / week", adj = 0, cex = 0.75)
+```
 
-lines(d_wd, col = "brown", lwd = 2)
-lines(d_bl, col = "blue", lwd = 2)
+## Moths
 
-legend("topright",
-       legend = c("Fine–grain", "Woodland", "Baseline"),
-       col = c("darkgreen", "brown", "blue"),
-       lwd = 2,
-       bty = "o",
-       cex = 1.2)
-#task 6
-bf <- read.csv("ECN_IB1.csv", stringsAsFactors = FALSE)
-mt <- read.csv("ECN_IM1.csv", stringsAsFactors = FALSE)
+### Brief description
+Moths (IM) are collected using a standard light trap at fixed locations, usually with nightly sampling.
 
-bf$VALUE <- suppressWarnings(as.numeric(bf$VALUE))
-mt$VALUE <- suppressWarnings(as.numeric(mt$VALUE))
+```{r Moths}
+plot.new()
+plot.window(xlim = c(0, 10), ylim = c(0, 6))
+title(main = "IM: moths", font.main = 2, cex.main = 1.4)
 
-bf <- bf[!is.na(bf$VALUE), ]
-mt <- mt[!is.na(mt$VALUE), ]
+# Time
+text(0.6, 5.0, "Time", adj = 0, font = 2)
+arrows(1.2, 4.9, 4.2, 4.9, length = 0.08, lwd = 2)
+text(1.7, 5.25, "nightly (sometimes >1 day)", adj = 0, cex = 0.85)
 
-bf <- bf[bf$FIELDNAME != "XX", ]
+# Space
+text(0.6, 4.0, "Space", adj = 0, font = 2)
+rect(1.7, 1.7, 2.8, 2.9, lwd = 2)
+symbols(2.25, 3.5, circles = 0.22, inches = FALSE, add = TRUE)
+lines(c(2.25, 2.25), c(2.9, 3.25), lwd = 1.8)
+text(1.3, 1.2, "fixed light trap location", adj = 0, cex = 0.8)
 
-mt <- mt[!grepl("^Q", mt$FIELDNAME) & mt$FIELDNAME != "XX", ]
+# Table
+text(6.1, 4.0, "Table", adj = 0, font = 2)
+rect(6.0, 2.6, 8.9, 3.6, lwd = 2)
+text(6.2, 3.1, "site | loc | date | field | value", adj = 0, cex = 0.78)
+rect(6.0, 1.2, 8.9, 2.0, lwd = 2)
+text(6.2, 1.6, "trap period info", adj = 0, cex = 0.8)
+```
 
-bf$DATE <- as.Date(bf$SDATE, format = "%d-%b-%y")
-mt$DATE <- as.Date(mt$SDATE, format = "%d-%b-%y")
+\newpage
 
-bf$YEAR  <- as.numeric(format(bf$DATE, "%Y"))
-bf$MONTH <- as.numeric(format(bf$DATE, "%m"))
 
-mt$YEAR  <- as.numeric(format(mt$DATE, "%Y"))
-mt$MONTH <- as.numeric(format(mt$DATE, "%m"))
+# Task 3: Data quality assessment 
+*Limits per dataset: 0.5 pages text in 11pt font with single line spacing + 2 figures + 1 table.*
 
-bf <- bf[!is.na(bf$YEAR) & !is.na(bf$MONTH), ]
-mt <- mt[!is.na(mt$YEAR) & !is.na(mt$MONTH), ]
+## Fine-grain vegetation
+###General overview
 
-bf <- bf[bf$YEAR >= 2000 & bf$YEAR <= 2010, ]
-mt <- mt[mt$YEAR >= 2000 & mt$YEAR <= 2010, ]
+```{r General Overveiw Fine-grain DQA 1}
+# to do this we will remove and review quality codes and observe the species per cell per plot 
+quality <-FineGrain[FineGrain$FIELDNAME !="VEG_SPEC" ,]
+QualityCodes<-ggplot(quality, aes(x = FIELDNAME , fill = SITECODE)) +geom_bar() + labs(title = "Quality codes per site ")
 
-common_sites <- intersect(unique(bf$SITECODE), unique(mt$SITECODE))
 
-bf <- bf[bf$SITECODE %in% common_sites, ]
-mt <- mt[mt$SITECODE %in% common_sites, ]
+# now veiw species data and again stratify by site 
+species <-FineGrain[FineGrain$FIELDNAME =="VEG_SPEC" ,]
+DatapointsPerYear<-ggplot(species, aes(x = SYEAR , fill = SITECODE)) +geom_bar() + labs(title = "Samples per Year by site ")
 
-bf <- bf[bf$MONTH >= 4 & bf$MONTH <= 9, ]
-mt <- mt[mt$MONTH >= 4 & mt$MONTH <= 9, ]
+#plot the plots 
+DatapointsPerYear/QualityCodes +plot_layout(guides = "collect")
+```
+The year  by year plots have very strong every 3 year looking tendency in just general numbers . in terms of missingness you cannot tell much from this , however it appears to have a less species recorded in later years or less plots sampled when really you would expect either more data coming in or more sites implemented however there is no available data on the last 10 years and this suggests maybe a reason for the tail off which also questions the completeness of the data. 
 
-bf_daily <- aggregate(VALUE ~ SITECODE + DATE + MONTH, data = bf, sum, na.rm = TRUE)
-mt_daily <- aggregate(VALUE ~ SITECODE + DATE + MONTH, data = mt, sum, na.rm = TRUE)
+It doesn't actually specify what the Q's mean in the Documentation,  from there being an exponential decay it may be an indicator of the severity of the problem in the sampling. I suspect the Q's describe how it may effect the output of data analysis. and they have values associated with varying reasons of either data censoring or things that may effect the fairness of test  eg Sheep Grazing or local boggie stream .  
+###Timelyness
+it is very hard to tell if these are accurate measurement of timelyness but the code should contain no logical errors and i have made an individual graph for each site
+```{r Fine-grain DQA 2}
 
-bf_month <- aggregate(VALUE ~ MONTH, data = bf_daily, median, na.rm = TRUE)
-mt_month <- aggregate(VALUE ~ MONTH, data = mt_daily, median, na.rm = TRUE)
+FineGrainArr <- arrange(FineGrain,SITECODE,PLOTPID,SYEAR)
+FineGrain_assesments <- FineGrainArr[FineGrain$FIELDNAME == "VEG_SPEC",]
+  # removing the quality codes 
+# groups by location 
+yearPLOTS_FineGrain <- group_by(FineGrain_assesments ,SITECODE , PLOTPID)
+# distinctive the rows per group . 
 
-all_months <- data.frame(MONTH = 4:9)
-bf_month <- merge(all_months, bf_month, by = "MONTH", all.x = TRUE)
-mt_month <- merge(all_months, mt_month, by = "MONTH", all.x = TRUE)
+TimeStaggers <-  mutate(distinct(yearPLOTS_FineGrain,SYEAR),difference = SYEAR-lag(SYEAR))
 
-bf_month$NORM <- bf_month$VALUE / max(bf_month$VALUE, na.rm = TRUE)
-mt_month$NORM <- mt_month$VALUE / max(mt_month$VALUE, na.rm = TRUE)
 
-print(bf_month)
-print(mt_month)
+TimeStaggers_clean <- TimeStaggers[!is.na(TimeStaggers$difference),]
+ggplot(TimeStaggers_clean,aes(x = difference, fill = SITECODE))+ geom_bar()+scale_x_continuous(breaks = 1:10) +labs(title =paste0("Difference(years) between Consecutive sample's,  Mean difference:" ,round(mean(TimeStaggers_clean$difference),4)))
 
-plot(bf_month$MONTH, bf_month$NORM,
-     type = "o",
-     pch = 16,
-     lwd = 2,
-     col = "steelblue",
-     ylim = c(0.12, 1.05),
-     xaxt = "n",
-     xlab = "Month",
-     ylab = "Median abundance (normalized to 1)",
-     main = "Normalized seasonal profiles: butterflies vs moths")
 
-axis(1, at = 4:9, labels = 4:9)
 
-lines(mt_month$MONTH, mt_month$NORM,
-      type = "o",
-      pch = 16,
-      lwd = 2,
-      col = "darkorange")
 
-legend("topleft",
-       legend = c("Butterflies (IB)", "Moths (IM, Apr-Sep)"),
-       col = c("steelblue", "darkorange"),
-       lwd = 2,
-       pch = 16,
-       bty = "n")
+```
+note that the data suggested a 3 year time difference between times of samples .The data has outputted 1.74 and this is not as expected and may effect how we treat the data. if anything with agencys like this you would expect a lower sample frequency than expected as you need to not overtrample your datasites . this also may be censored as if a datapoint was rechorded two years in a row and never rechorded again and thia happened frequently it would majorly skew the data
+## Woodland
+```{r Woodland DQA}
+# to do this we will remove and review quality codes and observe the species per cell per plot 
+quality <-Woodland
+QualityCodes<-ggplot(quality, aes(x = FIELDNAME , fill = SITECODE)) +geom_bar() + labs(title = "Sample codes per site ")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+
+# now veiw species data and again stratify by site 
+species <-Woodland
+DatapointsPerYear<-ggplot(species, aes(x = SYEAR , fill = SITECODE)) +geom_bar(position = "stack") + labs(title = "Samples per Year by site ") 
+
+#plot the plots 
+DatapointsPerYear/QualityCodes +plot_layout(guides = "collect")
+
+```
+note only certain places in sites 5,6,8,9 were sampled from , Samples By year is interesting as T05 and T06 are seemingly only rechorded once which is useless , or after being rechorded the areas have been under controlled forestry and cut or something . no meaningfully obvious 9 year trend present unlike the Fine Grain .
+
+the Sample codes tell us how much of each type of data was recorded and we can see large disparitys in what id expect as for each diameter of  a tree you would expect a height . this  may have been harder to measure possibly suggesting some data needs to be filled in , perhaps by a linear regression 
+```{r Woodland DQA 2}
+
+WoodlandArr <- arrange(Woodland,SITECODE,PLOTPID,SYEAR)
+# no need to remove any datapoints as distinct should do it 
+
+
+# groups by location 
+yearPLOTS_Woodland <- group_by(WoodlandArr ,SITECODE , PLOTPID)
+# distinctive the rows per group . 
+
+TimeStaggers <-  mutate(distinct(yearPLOTS_Woodland,SYEAR),difference = SYEAR-lag(SYEAR))
+
+
+TimeStaggers_clean <- TimeStaggers[!is.na(TimeStaggers$difference),]
+ggplot(TimeStaggers_clean,aes(x = difference, fill = SITECODE))+ geom_bar()+scale_x_continuous(breaks = 1:10) +labs(title =paste0("Difference(years) between Consecutive sample's,  Mean difference:" ,round(mean(TimeStaggers_clean$difference),4)))
+
+
+
+
+```
+ again not as expected as 2.6 << 9 years  , i expect some censoring here as well as this is ridiculous and the number or 1 2 and 3 year gaps is very not expected .aswell as the fact there must only be one rechording of T05 and T06 as there isnt an entry for them as the legend doesnt contain them . 
+## Baseline vegetation
+```{r Baseline DQA}
+# to do this we will remove and review quality codes and observe the species per cell per plot 
+quality <- Baseline[Baseline$FIELDNAME!= "VEG_SPEC", ]
+QualityCodes2<-ggplot(quality, aes(x = FIELDNAME , fill = SITECODE)) +geom_bar() + labs(title = "Sample codes per site ")
+
+
+# now view species data and again stratify by site 
+species <-Baseline
+DatapointsPerYear2<-ggplot(species, aes(x = SYEAR , fill = SITECODE)) +geom_bar(position = "stack") + labs(title = "Samples per Year by site ") 
+
+#plot the plots 
+DatapointsPerYear2
+QualityCodes2
+```
+this data is only sampled once so needs no temporal analysis and you can see it in the Per year plot and the quality code distribution is very similar to others however a very large proportion of T02 is deffective and may be enough to consider throwing out T2 from analysis. 
+
+## Butterflies
+```{r Butterfly DQA}
+
+```
+
+## Moths
+```{r Moth DQA}
+
+```
+
+
+# Task 4: Exploratory data analysis 
+*Limits per dataset: 0.5 pages text in 11pt font with single line spacing + 4 figures + 1 table.*
+
+## Fine-grain vegetation
+```{r Fine-grain EDA}
+## how many assesments per plot 
+yearPLOTS_FineGrain <- group_by(FineGrain , PLOTPID,SITECODE)
+
+
+APP<-summarise(yearPLOTS_FineGrain,Nservey = n_distinct(SYEAR) , lengtOT = diff(range(SYEAR)))
+
+
+ggplot(APP,aes(x =Nservey ,fill = SITECODE))+ geom_bar()+scale_x_continuous(breaks = 1:25) +labs(title = "Number of Unique years data has been rechorded")
+
+# 245 plots all of them measured approx over 20 years as some start late and some are weird 
+mean(APP$Nservey)
+mean(APP$lengtOT)
+mean(APP$lengtOT)/mean(APP$Nservey)
+
+ #  looking for some time dependent features of the graph
+yearPLOTS_FineGrain <- group_by(FineGrain , SYEAR  , PLOTPID,VALUE)
+
+plantindex =summarise(yearPLOTS_FineGrain,NcoveredPlots =n()/10) %>% summarise( plotmean = mean(NcoveredPlots))  %>% summarise(yearMean = mean(plotmean))
+
+ggplot(plantindex, aes(x =unique(FineGrain$SYEAR) , y = yearMean))+geom_col(fill = "forestgreen") + labs(title = "average percentage coverage of a plant over a Plot")
+
+plantBoxes =summarise(yearPLOTS_FineGrain,NcoveredPlots =n()/10) %>% summarise( plotmean = mean(NcoveredPlots))  
+
+ggplot(plantBoxes, aes(x = SYEAR,group =SYEAR , y = plotmean))+geom_boxplot() + labs(title = "Boxplots of coverage Per plant over a Plot")
+
+
+```
+this shows the Number of surveys per site over the 22 years these sites have been running for , we calculated another average for timeliness at 1.54 to back the claims of the earlier calculation of it being bizarrely low however the modal values of 6 and 7 are as expected . note this should be a much less censored version of the last way we calculated this and it gives a lower estimate
+
+for the percentage coverage the box plots show a kind of decline in the later years of sampling but this could be because fewer samples were recorded at these times but the skew is definitely more downwards. 
+
+## Woodland
+```{r Woodland EDA}
+
+   
+```
+
+## Baseline vegetation
+```{r Baseline EDA}
+
+```
+
+## Butterflies
+```{r Butterfly EDA}
+
+```
+
+## Moths
+```{r Moth EDA}
+
+```
+
+
+# Task 5: Cross-data comparison for vegetation 
+
+
+
+###Question: 
+This comparison examines whether differences between a woodland-focused subset of VF and VW mainly reflect ecological pattern or sampling design.
+
+### Data preparation
+
+```{r}
+vf1 <- FineGrain
+vf2 <- FineGrain2
+vw1 <- Woodland
+```
+### Construct comparable subsets
+
+```{r}
+shared_sites <- intersect(unique(vf1$SITECODE), unique(vw1$SITECODE))
+
+vf2_sub <- vf2[
+  vf2$SITECODE %in% shared_sites &
+  !is.na(vf2$LANDUSE) &
+  vf2$LANDUSE %in% c(11, 12, 13),
+  c("SITECODE", "SYEAR", "PLOTPID", "LANDUSE")
+]
+
+vf_join <- merge(
+  vf1,
+  vf2_sub,
+  by = c("SITECODE", "SYEAR", "PLOTPID")
+)
+
+vf_tmp <- vf_join[
+  vf_join$FIELDNAME == "VEG_SPEC" &
+  !is.na(vf_join$VALUE) &
+  vf_join$VALUE > 0,
+  c("SITECODE", "SYEAR", "PLOTPID", "VALUE")
+]
+
+vf_rich <- aggregate(
+  VALUE ~ SITECODE + SYEAR + PLOTPID,
+  data = vf_tmp,
+  FUN = function(x) length(unique(x))
+)
+names(vf_rich)[names(vf_rich) == "VALUE"] <- "richness"
+vf_rich$dataset <- "VF woodland subset"
+
+vw_tmp <- vw1[
+  vw1$FIELDNAME == "SEEDLING" &
+  !is.na(vw1$VALUE) &
+  vw1$VALUE > 0,
+  c("SITECODE", "SYEAR", "PLOTPID", "VALUE")
+]
+
+vw_rich <- aggregate(
+  VALUE ~ SITECODE + SYEAR + PLOTPID,
+  data = vw_tmp,
+  FUN = function(x) length(unique(x))
+)
+names(vw_rich)[names(vw_rich) == "VALUE"] <- "richness"
+vw_rich$dataset <- "VW seedling richness"
+
+veg_compare <- rbind(
+  vf_rich[, c("SITECODE", "SYEAR", "PLOTPID", "richness", "dataset")],
+  vw_rich[, c("SITECODE", "SYEAR", "PLOTPID", "richness", "dataset")]
+)
+
+head(veg_compare)
+```
+
+### Summary table
+
+```{r}
+summary_fun <- function(x) {
+  c(
+    n = length(x),
+    median_richness = median(x),
+    q1 = as.numeric(quantile(x, 0.25)),
+    q3 = as.numeric(quantile(x, 0.75))
+  )
+}
+
+veg_table <- as.data.frame(do.call(
+  rbind,
+  tapply(veg_compare$richness, veg_compare$dataset, summary_fun, simplify = FALSE)
+))
+
+veg_table$dataset <- rownames(veg_table)
+rownames(veg_table) <- NULL
+veg_table <- veg_table[, c("dataset", "n", "median_richness", "q1", "q3")]
+
+veg_table
+```
+
+### Figure
+
+```{r}
+boxplot(
+  richness ~ dataset,
+  data = veg_compare,
+  col = c("darkgreen", "sienna3"),
+  main = "Task 5. Woodland-related richness comparison between VF and VW",
+  xlab = "",
+  ylab = "Richness per plot"
+)
+```
+
+### Justification: 
+To make the datasets comparable, the VF subset was restricted to plot-years classified as woodland, coniferous woodland or scrub at the four sites shared with VW . The VF summary metric is plot richness across the ten sampled cells, while the VW metric is seedling-species richness per plot, which is the closest directly comparable richness measure available in the woodland file.
+
+### Results: 
+VF woodland/scrub plots are much richer than VW plots. The VF subset has a median richness of 17 species whereas VW has a median seedling richness of 1 species. The two distributions overlap only slightly.
+
+### Interpretation: 
+The difference is driven mainly by sampling design rather than by ecological contrast alone. VF records all taxa present in sampled ground-layer cells, including non-woody species, bryophytes and lichens, so richness is necessarily much higher. By contrast, VW is designed to capture woodland structure and regeneration, so seedling richness represents a much narrower component of vegetation change.
+
+# Task 6: Cross-data comparison for invertebrates
+*Limits: 200 words text + 1 figure + 1 table.*
+
+
+### Question
+This section compares the butterfly dataset (IB) and the moth dataset (IM) to assess whether the observed difference mainly reflects ecological differences between the groups or differences in monitoring design.
+
+### Data preparation
+
+```{r}
+ib <- Butterflies
+im <- Moths
+
+ib$VALUE <- suppressWarnings(as.numeric(ib$VALUE))
+im$VALUE <- suppressWarnings(as.numeric(im$VALUE))
+
+ib$DATE <- as.Date(ib$SDATE, format = "%d-%b-%y")
+im$DATE <- as.Date(im$SDATE, format = "%d-%b-%y")
+
+ib$YEAR <- as.numeric(format(ib$DATE, "%Y"))
+im$YEAR <- as.numeric(format(im$DATE, "%Y"))
+ib$MONTH <- as.numeric(format(ib$DATE, "%m"))
+im$MONTH <- as.numeric(format(im$DATE, "%m"))
+```
+
+### Construct comparable subsets
+
+```{r}
+shared_sites <- intersect(unique(ib$SITECODE), unique(im$SITECODE))
+
+# -------------------
+# Butterflies (IB)
+# -------------------
+ib_sub <- ib[
+  ib$SITECODE %in% shared_sites &
+  !is.na(ib$VALUE) &
+  !is.na(ib$MONTH) &
+  ib$MONTH %in% 4:9 &
+  ib$FIELDNAME != "XX",
+]
+
+ib_abund <- aggregate(
+  VALUE ~ SITECODE + SDATE + MONTH,
+  data = ib_sub,
+  FUN = sum
+)
+names(ib_abund)[names(ib_abund) == "VALUE"] <- "abundance"
+
+ib_rich <- aggregate(
+  FIELDNAME ~ SITECODE + SDATE + MONTH,
+  data = ib_sub[ib_sub$VALUE > 0, ],
+  FUN = function(x) length(unique(x))
+)
+names(ib_rich)[names(ib_rich) == "FIELDNAME"] <- "richness"
+
+ib_daily <- merge(ib_abund, ib_rich, by = c("SITECODE", "SDATE", "MONTH"), all = TRUE)
+ib_daily$richness[is.na(ib_daily$richness)] <- 0
+ib_daily$dataset <- "Butterflies"
+
+# -------------------
+# Moths (IM)
+# -------------------
+im_sub <- im[
+  im$SITECODE %in% shared_sites &
+  !is.na(im$VALUE) &
+  !is.na(im$MONTH) &
+  im$MONTH %in% 4:9 &
+  !grepl("^Q", im$FIELDNAME) &
+  im$FIELDNAME != "XX",
+]
+
+im_abund <- aggregate(
+  VALUE ~ SITECODE + SDATE + MONTH,
+  data = im_sub,
+  FUN = sum
+)
+names(im_abund)[names(im_abund) == "VALUE"] <- "abundance"
+
+im_rich <- aggregate(
+  FIELDNAME ~ SITECODE + SDATE + MONTH,
+  data = im_sub[im_sub$VALUE > 0, ],
+  FUN = function(x) length(unique(x))
+)
+names(im_rich)[names(im_rich) == "FIELDNAME"] <- "richness"
+
+im_daily <- merge(im_abund, im_rich, by = c("SITECODE", "SDATE", "MONTH"), all = TRUE)
+im_daily$richness[is.na(im_daily$richness)] <- 0
+im_daily$dataset <- "Moths"
+
+inv_compare <- rbind(
+  ib_daily[, c("SITECODE", "SDATE", "MONTH", "abundance", "richness", "dataset")],
+  im_daily[, c("SITECODE", "SDATE", "MONTH", "abundance", "richness", "dataset")]
+)
+
+head(inv_compare)
+```   
+
+### Summary table
+
+```{r}
+summary_fun <- function(a, r) {
+  c(
+    n = length(a),
+    median_abundance = median(a),
+    median_richness = median(r)
+  )
+}
+
+ib_summary <- summary_fun(ib_daily$abundance, ib_daily$richness)
+im_summary <- summary_fun(im_daily$abundance, im_daily$richness)
+
+inv_table <- data.frame(
+  dataset = c("Butterflies", "Moths"),
+  n = c(ib_summary["n"], im_summary["n"]),
+  median_abundance = c(ib_summary["median_abundance"], im_summary["median_abundance"]),
+  median_richness = c(ib_summary["median_richness"], im_summary["median_richness"])
+)
+
+inv_table
+```
+
+### Seasonal profile figure
+
+```{r}
+season_compare <- aggregate(
+  abundance ~ dataset + MONTH,
+  data = inv_compare,
+  FUN = median
+)
+names(season_compare)[names(season_compare) == "abundance"] <- "median_abundance"
+
+season_compare$normalized <- ave(
+  season_compare$median_abundance,
+  season_compare$dataset,
+  FUN = function(x) x / max(x)
+)
+
+bf <- season_compare[season_compare$dataset == "Butterflies", ]
+mt <- season_compare[season_compare$dataset == "Moths", ]
+
+plot(
+  bf$MONTH, bf$normalized,
+  type = "o", pch = 16, lwd = 2, col = "steelblue",
+  ylim = c(0, 1.05), xaxt = "n",
+  xlab = "Month",
+  ylab = "Median abundance (normalized to 1)",
+  main = "Task 6. Normalized seasonal profiles for butterflies and moths"
+)
+axis(1, at = 4:9, labels = c("Apr", "May", "Jun", "Jul", "Aug", "Sep"))
+lines(mt$MONTH, mt$normalized, type = "o", pch = 16, lwd = 2, col = "darkorange")
+legend(
+  "topleft",
+  legend = c("Butterflies", "Moths"),
+  col = c("steelblue", "darkorange"),
+  lwd = 2,
+  pch = 16,
+  bty = "n"
+)
+```
+
+### Justification
+The comparison was restricted to sites common to both datasets. IB was summarised at the survey-day level and IM at the trap-day level. IM was limited to April–September to match the butterfly monitoring window as closely as possible.
+
+### Results
+In this version of the analysis, both datasets have the same median sample-level richness of 4 species. Median abundance is 16 individuals per sample for butterflies and 7 for moths. Both seasonal profiles peak in July, but moth abundance remains relatively high into August and September, while butterfly abundance declines more sharply after July.
+
+### Interpretation
+The shared July peak suggests a genuine seasonal signal, but differences in the profile shape also reflect method. IB is a daytime visual transect survey, whereas IM is a trap-based nocturnal sampling design.
+
+
+
