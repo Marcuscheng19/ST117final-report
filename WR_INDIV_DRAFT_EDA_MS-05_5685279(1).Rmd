@@ -1,0 +1,489 @@
+---
+title: "ST117 Individual DRAFT Written Report - Phase 1 (EDA)"
+author: "My WARWICK ID 5685279 (Report Pod MS-05)"
+date: "16/04/2026" 
+output: pdf_document
+geometry: top=1cm, bottom=1cm
+---
+
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(tidyr)
+library(knitr)
+library(ggplot2)
+library(lubridate)
+library(viridis)
+library(RColorBrewer)
+```
+
+
+# Task 1: Context and study design
+The ECN databases include long-term surveys of moths, butterflies, forest vegetation, and fine-grain vegetation from monitoring sites across the UK. Each dataset captures different aspects of biodiversity. The moth and butterfly datasets are based on repeated count data, recording species identity and abundance using standardised methods like light trapping for moths and transect counts for butterflies. In contrast, the vegetation datasets focus more on plant communities, with fine-grain vegetation capturing data at a much smaller quadrat scale, while forest vegetation reflects broader plot-level composition and percentage cover.
+
+There are clear differences in how these datasets are structured. Vegetation data tends to use cover or presence measures and is collected less frequently, whereas invertebrate data is count-based and sampled more regularly. Spatial resolution also varies: woodland vegetation represents larger-scale patterns, while fine-grain vegetation captures more detailed variation within plots.
+
+Sampling is designed to allow replication both within and between sites, using a nested structure (sites -> plots or transects -> quadrats or sampling points.) The frequency of sampling reflects ecological processes - plants are surveyed less often due to slower changes in community structure, while moth and butterfly surveys are carried out regularly, often weekly or seasonally.
+
+Overall, these datasets are really useful for exploring ecological questions like species resposnses to environmental change, temporal trends in biodiversity, and the spatial variation in community composition. Vegetation data helps us understand community structure and succession, while invertebrate data is better suited for analysing population dynamics and phenology. When you bring them together, they give a more complete picture of ecosystem change across both taxonomic groups and spatial scales.
+
+# Task 2: Diagrams
+
+## Fine-grain vegetation (1994-2015)
+```{r fine-grain, fig.width=7, fig.height=4}
+fg = read.csv("ECN_VF1.csv")
+
+library(ggplot2)
+ggplot(fg, aes(x = SYEAR)) +
+  geom_bar(fill = "darkgreen") +
+  labs(title = "Fine-grain vegetation: sampling over time",
+       x = "Year", y = "Number of observations") +
+  theme_minimal()
+```
+
+## Woodland (1993-2014)
+```{r woodland, fig.width=7, fig.height=4}
+wd <- read.csv("ECN_VW1.csv")
+
+ggplot(wd, aes(x = SYEAR)) +
+  geom_bar(fill = "forestgreen") +
+  labs(title = "Woodland vegetation: sampling over time",
+       x = "Year", y = "Number of observations") +
+  theme_minimal()
+```
+
+## Baseline vegetation (1991–2000)
+```{r baseline-veg, fig.width=7, fig.height=4}
+
+ggplot(wd, aes(x = SYEAR)) +
+  geom_bar(fill = "seagreen") +
+  coord_cartesian(xlim = c(1991, 2000)) +
+  labs(title = "Baseline vegetation: sampling over time",
+       x = "Year", y = "Number of observations") +
+  theme_minimal()
+```
+
+## Butterflies
+```{r butterflies, fig.width=7, fig.height=4}
+bf <- read.csv("ECN_IB1.csv")
+
+ggplot(bf, aes(x = SDATE)) +
+  geom_bar(fill = "orange") +
+  labs(title = "Butterflies: sampling over time",
+       x = "Year", y = "Number of observations") +
+  theme_minimal()
+```
+
+## Moths
+```{r moths, fig.width=7, fig.height=4}
+mt <- read.csv("ECN_IM1.csv")
+
+ggplot(mt, aes(x = SDATE)) +
+  geom_bar(fill = "purple") +
+  labs(title = "Moths: sampling over time",
+       x = "Year", y = "Number of observations") +
+  theme_minimal()
+```
+
+
+# Task 3: Data quality assessment 
+
+
+## Fine-grain vegetation
+The majority of the variables in the fine-grained vegetation dataset have no missing values, indicating usually high consistency and completeness. Nonetheless, the CELLID variable has a significant number of missing values, suggesting that some observations have insufficient spatial referencing. Strong temporal coverage is supported by frequent sampling across years, and the measured variables seem to be standardised and ecologically valid.
+
+Due to its complete confinement to a single variable (CELLID) rather than its distribution throughout the dataset, missingness is highly organised. This implies that problems in recording spatial identifiers, rather than sampling failure, are the cause of missing data.
+
+There are clearly two major data problems. First, missing spatial identifiers (CELLID) may restrict spatial replication and make it harder to examine fine-scale geographical patterns. Second, even in the absence of widespread missing data, temporal comparisons may still be skewed by uneven sampling effort across years. Analyses of vegetation structure and change throughout time may be impacted by these problems.
+```{r Fine-grain DQA, fig.width=10, fig.height=6}
+fg <- read.csv("ECN_VF1.csv")
+
+missing_counts <- colSums(is.na(fg))
+
+par(mar = c(10, 4, 4, 2))
+barplot(missing_counts,
+        col = "darkgreen",
+        las = 2,
+        cex.names = 0.7,
+        main = "Fine-grain: Missing values per variable",
+        ylab = "Count of missing values")
+
+missing_counts
+```
+
+## Woodland
+
+A number of important variables, including CELLID, TREEID, STEMID, and TREE_SPEC, have significant missing values, despite the woods dataset's reasonable completeness. While within-plot data are sometimes lacking, core identifiers like site and year are intact, suggesting that the overall sampling structure is constant.
+
+Rather than happening at random, missingness is clearly structured and affects particular biological measuring variables. This implies that field sampling constraints, such as insufficient documentation of individual trees or stems, are probably connected to missing data.
+
+There are two main data problems. First, assessments of tree composition and structure are less reliable when important biological variables are missing. Second, because some elements of vegetation are better represented than others, bias is introduced by unequal completeness across variables. The interpretation of species composition and woodland dynamics may be impacted by these constraints.
+```{r Woodland DQA, fig.width=10, fig.height=6}
+wd <- read.csv("ECN_VW1.csv")
+
+missing_counts <- colSums(is.na(wd))
+
+par(mar = c(10, 4, 4, 2))
+barplot(missing_counts,
+        col = "forestgreen",
+        las = 2,
+        cex.names = 0.7,
+        main = "Woodland: Missing values per variable",
+        ylab = "Count of missing values")
+
+missing_counts
+```
+
+## Baseline vegetation
+
+With no missing values found for any variable, the baseline vegetation dataset exhibits excellent consistency and completeness. Strong data quality and accurate observation recording are indicated by this. Nevertheless, compared to later datasets, the dataset has a lower total sampling intensity since it covers an earlier and more constrained time period.
+
+There is no indication of bias resulting from incomplete data because there are no missing values. However, the dataset's smaller sampling effort and restricted temporal scope place limitations on it.
+
+There are two main problems found. First, the representativeness of early baseline conditions is limited by decreased sampling effort. Second, comparability over time may be impacted by any methodological variations from later datasets. Interpretations of long-term ecological change may be influenced by several factors.
+```{r Baseline DQA, fig.width=10, fig.height=6}
+baseline <- wd[wd$year >= 1991 & wd$year <= 2000, ]
+
+missing_counts <- colSums(is.na(baseline))
+
+par(mar = c(10, 4, 4, 2))
+barplot(missing_counts,
+        col = "seagreen",
+        las = 2,
+        cex.names = 0.7,
+        main = "Baseline vegetation: Missing values",
+        ylab = "Count of missing values")
+
+missing_counts
+```
+
+## Butterflies
+There are no missing values found in any of the variables in the butterfly dataset, making it extremely complete. Strong consistency, completeness, and data reliability are indicated by this. High temporal resolution is supported by the dataset, and regular sampling is appropriate for population dynamics analysis.
+
+There is no indication of bias resulting from incomplete observations because there is no missingness. The data seems to be consistent and well-structured across time and locations.
+
+There are still two significant problems, though. First, observed patterns of abundance may still be influenced by differences in sampling effort between years or places. Second, the absence of species is likely to cause zero inflation in count data, which could have an impact on statistical modelling. When evaluating trends in butterfly populations, several aspects should be taken into account.
+```{r Butterfly DQA, fig.width=10, fig.height=6}
+bf <- read.csv("ECN_IB1.csv")
+
+missing_counts <- colSums(is.na(bf))
+
+par(mar = c(10, 4, 4, 2))
+barplot(missing_counts,
+        col = "orange",
+        las = 2,
+        cex.names = 0.7,
+        main = "Butterflies: Missing values per variable",
+        ylab = "Count of missing values")
+
+missing_counts
+```
+
+## Moths
+
+High data quality and consistency in recording are demonstrated by the moth dataset, which displays complete data with no missing values across all variables. Strong ecological analysis is supported by the dataset, which covers a wide temporal range.
+
+Missingness does not constitute a source of bias because there are no missing values. The data seems to be constantly organised and dependable.
+
+There are two primary problems found. First, estimates of abundance may be biased due to differences in trapping effort over time or space. Second, because many species are missing from samples, severe zero inflation is anticipated. These elements may affect how population dynamics are interpreted, necessitating the use of suitable analytical techniques.
+```{r Moth DQA, fig.width=10, fig.height=6}
+mt <- read.csv("ECN_IM1.csv")
+
+missing_counts <- colSums(is.na(mt))
+
+par(mar = c(10, 4, 4, 2))
+barplot(missing_counts,
+        col = "purple",
+        las = 2,
+        cex.names = 0.7,
+        main = "Moths: Missing values per variable",
+        ylab = "Count of missing values")
+
+missing_counts
+```
+
+
+# Task 4: Exploratory data analysis 
+
+
+## Fine-grain vegetation
+We looked at the vegetation cover data (VALUE) in a few different ways to understand what's going on. This included checking how the values are spread out, how they change over time, how they differ between sites, and whether there's any link between cover and year. We used simple plots like histograms, time series, boxplots, and scatterplots to do this.
+
+The values are quite uneven. Most of them are on the lower side, but there are a few really high ones (up to 6030), which pull the average up. The middle value (median = 758) is quite a bit lower than the mean (around 995), showing that the data is skewed to the right. There aren't many zeros (the minimum is 1), but the spread of values is still very wide.
+
+Looking at changes over time, the number of observations goes up and down from year to year rather than following a steady pattern. This suggest that the amount of sampling wasn't consistent, instead of showing a clear long-term trend in vegetation cover.
+
+There are also clear difference between sites. Some sites have higher typical cover and more variation than others, especially those with higher site codes. This likely reflects real difference between locations, such as habitat type or how the land is managed. 
+
+When comparing vegetation cover to year, there's no clear trend. The points are scattered, and high or low values appear at different times without a consistent pattern. 
+
+Overall, the dataset looks complete with no missing values, but the strong skew, a few extreme values, and uneven sampling over time could affect how we interpret changes. These patterns most likely come from a mix of real ecological difference and changes in how the data was collected, so they should be kept in mind in further analysis.
+```{r Fine-grain EDA}
+fg <- read.csv("ECN_VF1.csv")
+
+hist(fg$VALUE, col="darkgreen", main="Fine-grain: Distribution of vegetation cover")
+
+fg_year <- table(fg$SYEAR)
+plot(names(fg_year), fg_year, type="l", col="darkgreen",
+     main="Sampling over time", xlab="Year", ylab="Observations")
+
+boxplot(VALUE ~ SITECODE, data=fg, las=2, col="darkgreen",
+        main="Spatial variation")
+
+pairs(fg[, c("SYEAR","VALUE")], main="Relationships")
+
+summary(fg$VALUE)
+```
+
+## Woodland
+For the woodland dataset, we focused on getting a general feel for how vegetation cover (VALUE) behaves by looking at its spread, how it changes over time, how it varies between sites, and whether any patterns link the variables together. 
+
+The spread of values is not even. Most observations sit at the lower end, with fewer high values, giving the data a right-skewed shape. This kind of pattern is fairly typical in vegetation studies, where dense cover is less common than sparse or moderate cover. When looking across years, the number of records changes quite a bit. Instead of a steady pattern, there are ups and down in how much data was collected, which points to differences in sampling effort rather than a clear ecological trend. 
+
+Comparing sites, there are noticeable contrasts in both typical cover and how much it varies. Some locations consistently show higher or more spread-out values, suggesting that local conditions - like habitat type or management - are influencing the results.
+```{r Woodland EDA}
+wd <- read.csv("ECN_VW1.csv")
+
+hist(wd$VALUE, col="forestgreen", main="Woodland distribution")
+
+wd_year <- table(wd$SYEAR)
+plot(names(wd_year), wd_year, type="l", col="forestgreen",
+     main="Woodland sampling over time")
+
+boxplot(VALUE ~ SITECODE, data=wd, las=2, col="forestgreen",
+        main="Woodland spatial variation")
+
+pairs(wd[, c("SYEAR","VALUE")])
+
+summary(wd$VALUE)
+```
+
+## Baseline vegetation
+For the baseline subset, we explored the vegation cover data (VALUE) to get a sense of how it behaves across the dataset, including how the values are spread out, how they change over time, how they differ between sites, and whether any clear patterns show up. 
+
+The data is quite uneven, with most values on the lower end and only a small number of higher ones. This creates a right-skewed pattern, which is common in ecological data like this. The time coverage is fairly limited, with fewer observations and a shorter span of years. This likely reflects lower sampling effort during the early stages of monitoring, rather than any clear pattern in vegetation change.
+
+Differences between sites are present, but they're not very strong. With a smaller number of observations, it's harder to clearly see consistent patterns or separate sites based on their vegeation cover. Looking at how the variables relate to each other, there is not much of a clear trend. The data points are quite scattered, with no obvious direction over time. 
+
+Overall, while the dataset doesn't have missing values, its shorter time span and smaller size mean it does not give a full picture. This makes it less reliable for understanding long-term changes in vegetation.
+```{r Baseline EDA}
+baseline <- wd[wd$SYEAR >= 1991 & wd$SYEAR <= 2000, ]
+
+hist(baseline$VALUE, col="seagreen", main="Baseline distribution")
+
+base_year <- table(baseline$SYEAR)
+plot(names(base_year), base_year, type="l", col="seagreen")
+
+boxplot(VALUE ~ SITECODE, data=baseline, las=2, col="seagreen")
+
+pairs(baseline[, c("SYEAR","VALUE")])
+
+summary(baseline$VALUE)
+```
+
+## Butterflies
+We exploited the butterfly count data by looking at how the values are distributed, how they change over time, how they vary between sites, and whether there's any clear link between counts and year. We used a mix of simple plots to get an overall picture of the data. 
+
+Most of the counts are very low, often zero or just one, with only a few higher values reaching up to 234. Even when using a log scale, the data is still heavily skewed. The average (around 2.36) is higher than the median (1), which shows that a small number of larger counts are pulling the mean up. This kind of pattern, with lots of zeros and occasional spikes, is common in ecological count data. 
+
+Looking at the data over time, the number of observations changes quite a bit. There are more records in the mid-1990s and again in the mid-2000s, but the number drops off after about 2011. This suggests that the data reflects changes in how often surveys were done, rather than a clear trend in butterfly numbers.
+
+There are also noticeable differences between sites. Some, like T09 and T10, tend to have higher counts and more variation, while many others mostly show low or zero values. This points to differences in local conditions or possible how surveys were carried out at each site. When comparing counts with year, there's no clear pattern. High and low values appear throughout the timeline without a steady increase or decrease.
+
+Overall, the dataset is quite large and useful, but the high number of zeros, the skewed distribution, and the uneven sampling over time mean that any conclusions about butterfly populations need to be made carefully.
+```{r Butterfly EDA, fig.width=10, fig.height=6}
+
+bf <- read.csv("ECN_IB1.csv", stringsAsFactors = FALSE)
+bf_clean <- bf[!is.na(bf$VALUE), ]
+bf_clean$SDATE <- as.Date(bf_clean$SDATE, format="%d-%b-%y")
+bf_clean$YEAR <- as.numeric(format(bf_clean$SDATE, "%Y"))
+
+hist(log1p(bf_clean$VALUE),
+     breaks=50,
+     col="orange",
+     main="Butterfly counts (log scale)",
+     xlab="log(Count + 1)",
+     ylab="Frequency")
+
+bf_year <- table(bf_clean$YEAR)
+
+plot(as.numeric(names(bf_year)), bf_year,
+     type="l", col="orange", lwd=2,
+     main="Butterfly sampling over time",
+     xlab="Year", ylab="Observations")
+
+boxplot(VALUE ~ SITECODE,
+        data=bf_clean,
+        las=2,
+        col="orange",
+        main="Butterfly counts by site",
+        ylab="Count")
+
+plot(bf_clean$YEAR, bf_clean$VALUE,
+     col=rgb(1,0.5,0,0.3),
+     pch=16,
+     main="Counts vs Year",
+     xlab="Year", ylab="Count")
+
+summary(bf_clean$VALUE)
+
+```
+
+## Moths
+We looked at the moth count data in a few different ways: by checking how the values are spread out, how they change over time, how they differ between sites, and how counts relate to the year. This included things like a log-scale histogram, a time series, boxplots for each site, and a scatterplot of counts versus year. These help us understand the overall shape of the data, how often we recorded moths over time, differences between locations, and whether there are any trends.
+
+The counts are very uneven. Most of the values are really low, often zero or just one, but there are a few very large numbers (up to 1666). Even after using a log scale, the data is heavily skewed. The average count (about 4.15) is much higher than the middle value (median = 1), which shows that a few big counts are pulling the average higher up. This kind of pattern is common in insect trap data.
+
+When we look at the data over time, the number of observations changes a lot. There was more sampling in the mid-1990s and early 2000s, but it drops off in later years. This likely reflects changes in how often trapping was done, rather than a clear change in moth populations.
+
+There are also clear differences between sites. Some locations, especially T06 and T12, tend to have higher counts and more variation, while most other sites mostly have low counts. This suggests that local conditions at each site play a big role.
+
+Finally, when comparing counts to year, there isn't a clear pattern. High values appear randomly rather than following a steady increase or decrease. Overall, the dataset gives useful information, but it's important to keep in mind the large number of zeros, the occasional extreme values, and the uneven sampling over time when interpreting the results. 
+```{r Moth EDA, fig.width=10, fig.height=6}
+
+mt <- read.csv("ECN_IM1.csv", stringsAsFactors = FALSE)
+
+mt$VALUE_num <- suppressWarnings(as.numeric(mt$VALUE))
+mt_clean <- mt[!is.na(mt$VALUE_num), ]
+mt_clean$SDATE <- as.Date(mt_clean$SDATE, format="%d-%b-%y")
+mt_clean$YEAR <- as.numeric(format(mt_clean$SDATE, "%Y"))
+mt_clean <- mt_clean[!is.na(mt_clean$YEAR), ]
+
+hist(log1p(mt_clean$VALUE_num),
+     breaks=50,
+     col="purple",
+     main="Moth counts (log scale)",
+     xlab="log(Count + 1)",
+     ylab="Frequency")
+
+mt_year <- table(mt_clean$YEAR)
+
+plot(as.numeric(names(mt_year)), mt_year,
+     type="l", col="purple", lwd=2,
+     main="Moth sampling over time",
+     xlab="Year", ylab="Observations")
+
+boxplot(VALUE_num ~ SITECODE,
+        data=mt_clean,
+        las=2,
+        col="purple",
+        main="Moth counts by site",
+        ylab="Count")
+
+plot(mt_clean$YEAR, mt_clean$VALUE_num,
+     col=rgb(0.5,0,0.5,0.3),
+     pch=16,
+     main="Counts vs Year",
+     xlab="Year", ylab="Count")
+
+summary(mt_clean$VALUE_num)
+
+```
+
+
+# Task 5: Cross-data comparison for vegetation 
+We compare vegetation cover (VALUE) across fine-grain, woodland, and baseline datasets using a common subset of overlapping years (2000-2010) to reduce bias from uneven sampling identified earlier. All three datasets show strong right-skewness, with most values low and a few large observations pulling the mean above the median (e.g fine-grain mean ~ 995 vs median ~ 758; baseline mean ~ 271 vs median ~ 10). Woodland shows a similar pattern but with additional variability linked to missing biological variables noted in Task 3.
+
+Fine-grain vegetation has the widest spread and highest upper values, reflecting more detailed sampling resolution. Woodland values are generally lower but more variable across plots, likely due to differences in species structure and missingness in identifiers (CELLID, TREEID). Baseline vegetation shows the lowest sampling intensity and narrower temporal coverage, which limits representativeness despite complete data.
+
+Across all datasets, there is no clear temporal trend; variability over time appears driven more by sampling effort than ecological change. Differences between datasets therefore likely reflect both scale of measurement (fine vs woodland aggregation) and data quality issues (missingness vs limited coverage), rather than purely ecological processes.
+## Vegetation
+```{r cross_dataset_figure, fig.width=7, fig.height=5}
+
+fg <- read.csv("ECN_VF1.csv", stringsAsFactors=FALSE)
+wd <- read.csv("ECN_VW1.csv", stringsAsFactors=FALSE)
+bl <- read.csv("ECN_VB1.csv", stringsAsFactors=FALSE)
+
+fg$VALUE <- suppressWarnings(as.numeric(fg$VALUE))
+wd$VALUE <- suppressWarnings(as.numeric(wd$VALUE))
+bl$VALUE <- suppressWarnings(as.numeric(bl$VALUE))
+
+fg$YEAR <- suppressWarnings(as.numeric(fg$SYEAR))
+wd$YEAR <- suppressWarnings(as.numeric(wd$SYEAR))
+bl$YEAR <- suppressWarnings(as.numeric(bl$SYEAR))
+
+fg <- fg[!is.na(fg$VALUE) & !is.na(fg$YEAR), ]
+wd <- wd[!is.na(wd$VALUE) & !is.na(wd$YEAR), ]
+bl <- bl[!is.na(bl$VALUE) & !is.na(bl$YEAR), ]
+
+common_years <- Reduce(intersect, list(unique(fg$YEAR), unique(wd$YEAR), unique(bl$YEAR)))
+
+fg_sub <- fg[fg$YEAR %in% common_years, ]
+wd_sub <- wd[wd$YEAR %in% common_years, ]
+bl_sub <- bl[bl$YEAR %in% common_years, ]
+
+fg_log <- log1p(fg_sub$VALUE)
+wd_log <- log1p(wd_sub$VALUE)
+bl_log <- log1p(bl_sub$VALUE)
+
+plot(density(fg_log), col="darkgreen", lwd=2,
+main="Vegetation comparison (log scale)",
+xlab="log(VALUE + 1)")
+
+lines(density(wd_log), col="brown", lwd=2)
+lines(density(bl_log), col="blue", lwd=2)
+
+legend("topright",
+legend=c("Fine-grain","Woodland","Baseline"),
+col=c("darkgreen","brown","blue"),
+lwd=2)
+
+```
+
+# Task 6: Cross-data comparison for invertebrates
+We compare butterfly and moth count data using a shared time window (2000-2010) to reduce the effect of uneven sampling identified earlier. Both datasets are highly right-skewed and show strong zero inflation, with most observations at 0-1 and a few large values pulling the mean above the median (butterflies: mean ~ 2.36 vs median = 1; moths: mean ~ 4.15 vs median = 1). This indicates typical over-dispersed count data. 
+
+Moths generally show a wider spread and higher extreme values (max ~ 1666) compared to butterflies (max ~ 234), suggesting greater variability in abundance or trapping efficiency. Despite this, both datasets lack a clear temporal trend; counts fluctuate across years rather than showing consistent increases or declines, reinforcing earlier evidence evidence that sampling effort likely drives much of the variation.
+
+Spatial variation is also evident, with certain sites consistently producing higher counts (e.g T06/T12 for moths, T09/T10 for butterflies), indicating site-level heterogeneity. From a data quality perspective, both datasets are complete (no missingness), but zero inflation and uneven effort introduce bias.
+
+Overall, differences between butterflies and moths appear to reflect both ecological differences (species abundance and detectability) and methodological factors (trap vs survey design), meaning results should be interpreted cautiously.
+## Invertebrates
+```{r invert_cross_figure, fig.width=7, fig.height=5}
+
+bf <- read.csv("ECN_IB1.csv", stringsAsFactors=FALSE)
+mt <- read.csv("ECN_IM1.csv", stringsAsFactors=FALSE)
+
+bf$VALUE <- suppressWarnings(as.numeric(bf$VALUE))
+mt$VALUE <- suppressWarnings(as.numeric(mt$VALUE))
+
+bf$YEAR2 <- substr(bf$SDATE, nchar(bf$SDATE)-1, nchar(bf$SDATE))
+mt$YEAR2 <- substr(mt$SDATE, nchar(mt$SDATE)-1, nchar(mt$SDATE))
+
+bf$YEAR <- ifelse(as.numeric(bf$YEAR2) > 50,
+                 1900 + as.numeric(bf$YEAR2),
+                 2000 + as.numeric(bf$YEAR2))
+
+mt$YEAR <- ifelse(as.numeric(mt$YEAR2) > 50,
+                 1900 + as.numeric(mt$YEAR2),
+                 2000 + as.numeric(mt$YEAR2))
+
+bf <- bf[!is.na(bf$VALUE) & !is.na(bf$YEAR), ]
+mt <- mt[!is.na(mt$VALUE) & !is.na(mt$YEAR), ]
+
+bf <- bf[bf$YEAR >= 2000 & bf$YEAR <= 2010, ]
+mt <- mt[mt$YEAR >= 2000 & mt$YEAR <= 2010, ]
+
+bf_log <- log1p(bf$VALUE)
+mt_log <- log1p(mt$VALUE)
+
+if(length(bf_log) > 10 & length(mt_log) > 10){
+
+plot(density(bf_log), col="orange", lwd=2,
+main="Butterflies vs Moths (log scale)",
+xlab="log(Count + 1)")
+
+lines(density(mt_log), col="purple", lwd=2)
+
+legend("topright",
+legend=c("Butterflies","Moths"),
+col=c("orange","purple"),
+lwd=2)
+
+} else {
+print("Still not enough data after fixing year")
+}
+```
+
+
+

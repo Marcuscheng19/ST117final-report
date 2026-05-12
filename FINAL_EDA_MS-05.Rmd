@@ -144,6 +144,8 @@ rect(5.9, 2.5, 9.1, 3.6, lwd = 2)
 text(6.1, 3.05, "site | year | plot | cell | tree | field | value", adj = 0, cex = 0.73)
 rect(5.9, 1.2, 9.1, 2.0, lwd = 2)
 text(6.1, 1.6, "survey dates: dom / dbh / seed", adj = 0, cex = 0.78)
+
+
 ```
 
 ## Butterflies
@@ -313,13 +315,60 @@ QualityCodes2
 this data is only sampled once so needs no temporal analysis and you can see it in the Per year plot and the quality code distribution is very similar to others however a very large proportion of T02 is deffective and may be enough to consider throwing out T2 from analysis. 
 
 ## Butterflies
-```{r Butterfly DQA}
+Consistency
+The data seems to be consistent.
+Completeness
+Approximately 13.3% of the data has missing
+Twice sites have been unable to collect data due to poor weather, both of these were site T02 in 1994SDATES
+Timeliness
+Data is hardly collected for T12, it is only collected for a few years around 2005 and additionally many sites stop collecting data after 2011.
+Validity
+There may be an outlier of 234 butterflies spotted in 2006 in T04.
 
+One major issue is that there are a lot of missing SDATES, primarily in site codes T08, T01, T05 and T06. This means that some of the data can't be used to compare changes over time and will cause incomplete data but we don't know where.
+Additionally most of the entries are XX which corresponds to no butterflies being seen so there is a very high zero inflation which needs to be removed or dealt with, the use of XX instead of 0 is problematic because sometimes you might want to know how many of them are zeros but in this case it needs to be changed to a numerical value to use.
+
+```{r Butterfly DQA, fig.width=10, fig.height=6}
+bf <- Butterflies
+missing_counts <- colSums(is.na(bf))
+
+par(mar = c(10, 4, 4, 2))
+barplot(missing_counts,
+        col = "orange",
+        las = 2,
+        cex.names = 0.7,
+        main = "Butterflies: Missing values per variable",
+        ylab = "Count of missing values")
+
+missing_counts
 ```
 
 ## Moths
-```{r Moth DQA}
+Consistency
+There seem to be no duplicates and the data is consistent.
+Completeness
+There are no columns that have any NA values however there is no data for T11 so it is hard to compare with other data sets that do have data for T11.
+Timeliness
+Site T12 wasn't covered at all before 2001 but aside from that there are very few gaps and sampling was carried out pretty much every year in every site in the dataset.
+Validity
+Site T06 in 1996 has a VALUE of 1999 which is much higher than all of the other values. It is clearly an outlier and may have come from a data entry error.
 
+One problem to do with missing data is the fact that T11 is not covered at all, this is problematic because it is a whole site that has not been counted, causing overall totals to decrease significantly and make it incomparable to say the butterflies dataset if you are going to include T11 as the butterflies will always be inflated.
+Another problem is the lack of data for T12 from before 2001, this makes it harder to compare growth/decrease of number of species, total moths or whatever else you want to compare timewise, it also means that totals are going to increase after 2000 so you might as well not include T12 at all when looking at changes over time.
+```{r Moth DQA, fig.width=10, fig.height=6}
+mt <- Moths
+
+missing_counts <- colSums(is.na(mt))
+
+par(mar = c(10, 4, 4, 2))
+barplot(missing_counts,
+        col = "purple",
+        las = 2,
+        cex.names = 0.7,
+        main = "Moths: Missing values per variable",
+        ylab = "Count of missing values")
+
+missing_counts
 ```
 
 
@@ -357,26 +406,187 @@ ggplot(plantBoxes, aes(x = SYEAR,group =SYEAR , y = plotmean))+geom_boxplot() + 
 ```
 this shows the Number of surveys per site over the 22 years these sites have been running for , we calculated another average for timeliness at 1.54 to back the claims of the earlier calculation of it being bizarrely low however the modal values of 6 and 7 are as expected . note this should be a much less censored version of the last way we calculated this and it gives a lower estimate
 
-for the percentage coverage the box plots show a kind of decline in the later years of sampling but this could be because fewer samples were recorded at these times but the skew is definitely more downwards. 
+for the percentage coverage the box plots show a kind of decline in the later years of sampling but this could be because fewer samples were recorded at these times but the skew is definitely more downwards. but generally this doesnt show much in the way of the fact a majority of plants if there present they tend to be covering a larger amount of the plot . 
 
 ## Woodland
 ```{r Woodland EDA}
+#the distribution of total vegetation count in each sample
+woodland2 = Woodland%>%
+  group_by(SITECODE,SYEAR,PLOTPID,CELLID)%>%
+  summarise(Total=n())
 
-   
+ggplot(woodland2,aes(Total))+
+  geom_histogram(col="hotpink4",fill="hotpink2")
+
+
+#variation over time
+woodland3=Woodland%>%
+  group_by(SYEAR)%>%
+  summarise(Total=n(),na.rm=TRUE)
+
+ggplot(woodland3,aes(SYEAR,Total))+
+  geom_point(col="hotpink4")+
+  geom_line(col="hotpink2")
+
+
+
+#spatial variation
+
+woodland <- Woodland%>%
+  group_by(SYEAR,SITECODE)%>%
+  summarise(Total=(n()),na.rm=TRUE)
+
+#stacked bar chart
+ggplot(woodland,aes(SYEAR,Total,fill=SITECODE))+
+  geom_bar(stat="identity")
 ```
+a.The variable chosen is total vegetation per sample, there were less samples of woodland vegetation than finegrain and they also resulted in fewer things being reported, between 0 and 25. The skew is much more significant in this case, with the mode being 2, almost all of the data is less than 5 and there are some outliers that go past that. Again, there are no zeros because nothing was reported so there was nothing to put in the data set.
+
+b. We investigate total number of things found in all of the samples each year. I use a line graph to show how the pattern changes as time passes. It shows inconsistency in the totals, this may be because of inconsistent sampling, samples not being taken when they were supposed to so not all sites' numbers are actually accounted for.
+
+c. We investigate number of species reported in each site each year, i use a stacked bar chart to show each site's number as a proportion of the total.It shows that sampling is inconsistent across sites, for example T05 and T06 only have results for one year so either they found nothing or they were hardly sampled. This likely is the cause of the results found in b.
+
 
 ## Baseline vegetation
 ```{r Baseline EDA}
+#the distribution of total vegetation count in each sample
+baseline3 = Baseline%>%
+  group_by(SITECODE,SYEAR,PLOTPID)%>%
+  summarise(Total=(n_distinct(VALUE[FIELDNAME=="VEG_SPEC"],na.rm=TRUE)))
+
+ggplot(baseline3,aes(Total))+
+  geom_histogram(col="hotpink4",fill="hotpink2")
+
+#variation over time
+baseline=Baseline%>%
+  group_by(SYEAR)%>%
+  summarise(Total=(n_distinct(VALUE[FIELDNAME=="VEG_SPEC"],na.rm=TRUE)))
+
+ggplot(baseline,aes(SYEAR,Total))+
+  geom_point(col="hotpink4")+
+  geom_line(col="hotpink2")
+
+
+#spatial variation
+
+baseline = Baseline%>%
+  group_by(SYEAR,SITECODE)%>%
+  summarise(Total=(n_distinct(VALUE[FIELDNAME=="VEG_SPEC"])),na.rm=TRUE)
+
+#stacked bar chart
+ggplot(baseline,aes(SYEAR,Total,fill=SITECODE))+
+  geom_bar(stat="identity")
+```
+a.The chosen variable was number of different things counted as part of each sample, this goes between 0 and 50. The data is slightly positively skewed with a mode at 11 and a few outliers towards the top end. There are no more zeros than you would expect, for some reason the data seems to have been collected differently than finegrain and woodland so any samples that spotted nothing were included this time.
+
+b.We investigate total number of species found each year, I chose a line graph to show how it changes over time, the plot shows that findings were inconsistent each year this may be because of less samples being taken or something happening in the area like flooding that caused it to significantly decrease after 1994.
+
+c.We investigate number of species found in each site each year, I use a stacked bar chart to show how totals change over time as well as totals for specific sites. The plot shows that there were only two years where most sites were sampled which makes sense given that it is a baseline but strangely T11 and T12 were sampled over several years, this may be that different plots were sampled at different times or they misunderstood the instructions or all of the other sites were not sampled when they should have been.
 
 ```
 
 ## Butterflies
-```{r Butterfly EDA}
+
+We exploited the butterfly count data by looking at how the values are distributed, how they change over time, 
+how they vary between sites, and whether there's any clear link between counts and year. We used a mix of simple plots to get an overall picture of the data. 
+Most of the counts are very low, often zero or just one, with only a few higher values reaching up to 234. Even when using a log scale, the data is still heavily skewed. 
+The average (around 2.36) is higher than the median (1), which shows that a small number of larger counts are pulling the mean up. This kind of pattern, with lots of zeros and occasional spikes, is common in ecological count data. 
+
+Looking at the data over time, the number of observations changes quite a bit. 
+There are more records in the mid-1990s and again in the mid-2000s, but the number drops off after about 2011.
+This suggests that the data reflects changes in how often surveys were done, rather than a clear trend in butterfly numbers.
+
+There are also noticeable differences between sites. Some, like T09 and T10, tend to have higher counts and more variation, while many others mostly show low or zero values.
+This points to differences in local conditions or possible how surveys were carried out at each site. When comparing counts with year,
+there's no clear pattern. High and low values appear throughout the timeline without a steady increase or decrease.
+
+Overall, the dataset is quite large and useful, but the high number of zeros, the skewed distribution, and the uneven sampling over time mean that any conclusions about butterfly populations need to be made carefully.
+```{r Butterfly EDA, fig.width=10, fig.height=6}
+
+bf <- Butterflies
+bf_clean <- bf[!is.na(bf$VALUE), ]
+bf_clean$SDATE <- as.Date(bf_clean$SDATE, format="%d-%b-%y")
+bf_clean$YEAR <- as.numeric(format(bf_clean$SDATE, "%Y"))
+
+hist(log1p(bf_clean$VALUE),
+     breaks=50,
+     col="orange",
+     main="Butterfly counts (log scale)",
+     xlab="log(Count + 1)",
+     ylab="Frequency")
+
+bf_year <- table(bf_clean$YEAR)
+
+plot(as.numeric(names(bf_year)), bf_year,
+     type="l", col="orange", lwd=2,
+     main="Butterfly sampling over time",
+     xlab="Year", ylab="Observations")
+
+boxplot(VALUE ~ SITECODE,
+        data=bf_clean,
+        las=2,
+        col="orange",
+        main="Butterfly counts by site",
+        ylab="Count")
+
+plot(bf_clean$YEAR, bf_clean$VALUE,
+     col=rgb(1,0.5,0,0.3),
+     pch=16,
+     main="Counts vs Year",
+     xlab="Year", ylab="Count")
+
+summary(bf_clean$VALUE)
 
 ```
 
 ## Moths
-```{r Moth EDA}
+We looked at the moth count data in a few different ways: by checking how the values are spread out, how they change over time, how they differ between sites, and how counts relate to the year. This included things like a log-scale histogram, a time series, boxplots for each site, and a scatterplot of counts versus year. These help us understand the overall shape of the data, how often we recorded moths over time, differences between locations, and whether there are any trends.
+
+The counts are very uneven. Most of the values are really low, often zero or just one, but there are a few very large numbers (up to 1666). Even after using a log scale, the data is heavily skewed. The average count (about 4.15) is much higher than the middle value (median = 1), which shows that a few big counts are pulling the average higher up. This kind of pattern is common in insect trap data.
+
+When we look at the data over time, the number of observations changes a lot. There was more sampling in the mid-1990s and early 2000s, but it drops off in later years. This likely reflects changes in how often trapping was done, rather than a clear change in moth populations.
+
+There are also clear differences between sites. Some locations, especially T06 and T12, tend to have higher counts and more variation, while most other sites mostly have low counts. This suggests that local conditions at each site play a big role.
+
+Finally, when comparing counts to year, there isn't a clear pattern. High values appear randomly rather than following a steady increase or decrease. Overall, the dataset gives useful information, but it's important to keep in mind the large number of zeros, the occasional extreme values, and the uneven sampling over time when interpreting the results. 
+```{r Moth EDA, fig.width=10, fig.height=6}
+
+mt <- Moths
+
+mt$VALUE_num <- suppressWarnings(as.numeric(mt$VALUE))
+mt_clean <- mt[!is.na(mt$VALUE_num), ]
+mt_clean$SDATE <- as.Date(mt_clean$SDATE, format="%d-%b-%y")
+mt_clean$YEAR <- as.numeric(format(mt_clean$SDATE, "%Y"))
+mt_clean <- mt_clean[!is.na(mt_clean$YEAR), ]
+
+hist(log1p(mt_clean$VALUE_num),
+     breaks=50,
+     col="purple",
+     main="Moth counts (log scale)",
+     xlab="log(Count + 1)",
+     ylab="Frequency")
+
+mt_year <- table(mt_clean$YEAR)
+
+plot(as.numeric(names(mt_year)), mt_year,
+     type="l", col="purple", lwd=2,
+     main="Moth sampling over time",
+     xlab="Year", ylab="Observations")
+
+boxplot(VALUE_num ~ SITECODE,
+        data=mt_clean,
+        las=2,
+        col="purple",
+        main="Moth counts by site",
+        ylab="Count")
+
+plot(mt_clean$YEAR, mt_clean$VALUE_num,
+     col=rgb(0.5,0,0.5,0.3),
+     pch=16,
+     main="Counts vs Year",
+     xlab="Year", ylab="Count")
+
+summary(mt_clean$VALUE_num)
 
 ```
 
